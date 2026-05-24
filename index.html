@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYLPHIETTE // PORTFOLIO</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-cyan: #00f5ff;
+    --neon-pink: #ff006e;
+    --neon-gold: #ffd700;
+    --neon-purple: #bf00ff;
+    --dark-bg: #020008;
+    --dark-panel: #0a0015;
+    --mid-panel: #0f001a;
+    --text-main: #e8e0ff;
+    --text-dim: #8878aa;
+    --accent1: #ff2d78;
+    --accent2: #00e5ff;
+    --accent3: #a855f7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  #cursor {
+    position: fixed; top: 0; left: 0;
+    width: 18px; height: 18px;
+    border: 2px solid var(--neon-cyan);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: width .2s, height .2s, background .2s, border-color .2s;
+    mix-blend-mode: difference;
+  }
+  #cursor-trail {
+    position: fixed; top: 0; left: 0;
+    width: 6px; height: 6px;
+    background: var(--neon-pink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: left .12s ease, top .12s ease;
+  }
+  body:hover #cursor { width: 22px; height: 22px; }
+
+  /* ── SCANLINES OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,245,255,.018) 2px,
+      rgba(0,245,255,.018) 4px
+    );
+    pointer-events: none;
+    z-index: 8000;
+  }
+
+  /* ── STARFIELD ── */
+  #starfield {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--d) ease-in-out infinite alternate;
+    opacity: var(--o);
+  }
+  @keyframes twinkle {
+    from { opacity: var(--o); transform: scale(1); }
+    to   { opacity: calc(var(--o) * .2); transform: scale(.5); }
+  }
+
+  /* ── FLOATING KANJI ── */
+  .kanji-bg {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .kanji-float {
+    position: absolute;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: clamp(40px, 8vw, 120px);
+    font-weight: 700;
+    opacity: .03;
+    color: var(--neon-cyan);
+    animation: kanjiDrift var(--kd) ease-in-out infinite;
+    user-select: none;
+  }
+  @keyframes kanjiDrift {
+    0%   { transform: translateY(0) rotate(var(--kr)); }
+    50%  { transform: translateY(-30px) rotate(calc(var(--kr) + 5deg)); }
+    100% { transform: translateY(0) rotate(var(--kr)); }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    background: linear-gradient(180deg, rgba(2,0,8,.95) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(0,245,255,.08);
+  }
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px; font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: none;
+  }
+  .nav-logo span {
+    font-size: 11px; font-weight: 400; letter-spacing: 8px;
+    display: block;
+    -webkit-text-fill-color: var(--text-dim);
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    position: relative;
+    transition: color .3s;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px;
+    background: var(--neon-cyan);
+    transition: width .3s;
+  }
+  .nav-links a:hover { color: var(--neon-cyan); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /* SVG anime character */
+  .hero-character {
+    position: absolute;
+    right: 8%; bottom: 0;
+    width: min(500px, 48vw);
+    z-index: 2;
+    animation: characterFloat 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(0,245,255,.35)) drop-shadow(0 0 80px rgba(255,0,110,.2));
+  }
+  @keyframes characterFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-18px); }
+  }
+
+  .hero-bg-circle {
+    position: absolute;
+    width: 700px; height: 700px;
+    right: 4%; bottom: -80px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,229,255,.08) 0%, rgba(168,85,247,.06) 50%, transparent 70%);
+    animation: pulseBg 5s ease-in-out infinite;
+  }
+  @keyframes pulseBg {
+    0%,100% { transform: scale(1); opacity: .7; }
+    50%      { transform: scale(1.07); opacity: 1; }
+  }
+
+  .hero-ring {
+    position: absolute;
+    right: calc(8% + min(500px,48vw)/2 - 320px);
+    bottom: 60px;
+    width: 640px; height: 640px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,245,255,.12);
+    animation: spinRing 20s linear infinite;
+  }
+  .hero-ring::before {
+    content: '';
+    position: absolute; inset: 30px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255,0,110,.15);
+    animation: spinRing 12s linear infinite reverse;
+  }
+  @keyframes spinRing { to { transform: rotate(360deg); } }
+
+  .hero-content {
+    position: relative; z-index: 3;
+    left: 0; padding-left: 8%;
+    max-width: 680px;
+  }
+  .hero-tag {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; letter-spacing: 6px;
+    color: var(--neon-pink);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block; width: 40px; height: 1px;
+    background: var(--neon-pink);
+    box-shadow: 0 0 8px var(--neon-pink);
+  }
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(42px, 6.5vw, 90px);
+    font-weight: 900;
+    line-height: .9;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+  }
+  .hero-title .line1 {
+    display: block;
+    background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 60%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: glitch 8s infinite;
+  }
+  .hero-title .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-gold) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-size: .55em;
+    letter-spacing: 8px;
+    font-weight: 400;
+    margin-top: 8px;
+  }
+  @keyframes glitch {
+    0%,96%,100% { text-shadow: none; }
+    97% { text-shadow: 3px 0 var(--neon-pink), -3px 0 var(--neon-cyan); transform: skewX(.5deg); }
+    98% { text-shadow: -3px 0 var(--neon-pink), 3px 0 var(--neon-cyan); transform: skewX(-.5deg); }
+    99% { text-shadow: none; transform: skewX(0); }
+  }
+  .hero-desc {
+    font-size: 17px; line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 440px;
+    margin-bottom: 40px;
+  }
+  .hero-desc strong { color: var(--neon-cyan); font-weight: 600; }
+  .hero-btns { display: flex; gap: 20px; flex-wrap: wrap; }
+
+  .btn-primary {
+    padding: 14px 36px;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    border: none; border-radius: 2px;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px; letter-spacing: 3px;
+    color: #fff; cursor: none;
+    text-transform: uppercase;
+    position: relative; overflow: hidden;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 10px;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 0 20px rgba(255,0,110,.4);
+  }
+  .btn-primary::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+    transition: left .5s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(255,0,110,.6); }
+  .btn-primary:hover::before { left: 150%; }
+
+  .btn-outline {
+    padding: 14px 36px;
+    background: transparent;
+    border: 1px solid var(--neon-cyan);
+    border-radius: 2px;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px; letter-spacing: 3px;
+    color: var(--neon-cyan); cursor: none;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 10px;
+    transition: background .3s, box-shadow .3s, transform .2s;
+    box-shadow: 0 0 10px rgba(0,245,255,.15);
+  }
+  .btn-outline:hover {
+    background: rgba(0,245,255,.08);
+    box-shadow: 0 0 30px rgba(0,245,255,.35);
+    transform: translateY(-2px);
+  }
+
+  .hero-stats {
+    position: absolute; bottom: 48px; left: 8%;
+    display: flex; gap: 48px;
+    z-index: 3;
+  }
+  .stat-item { text-align: left; }
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 32px; font-weight: 900;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── SCROLL INDICATOR ── */
+  .scroll-ind {
+    position: absolute; bottom: 48px; right: 48px;
+    z-index: 3;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .scroll-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px; letter-spacing: 4px;
+    color: var(--text-dim);
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(180deg, var(--neon-cyan), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%,100% { opacity: 1; transform: scaleY(1); }
+    50%      { opacity: .3; transform: scaleY(.6); }
+  }
+
+  /* ── SECTION COMMON ── */
+  section {
+    position: relative; z-index: 1;
+    padding: 120px 8%;
+  }
+  .section-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px; letter-spacing: 6px;
+    color: var(--neon-pink);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::before {
+    content: ''; width: 30px; height: 1px;
+    background: var(--neon-pink);
+    box-shadow: 0 0 6px var(--neon-pink);
+  }
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 900;
+    margin-bottom: 60px;
+    line-height: 1.1;
+  }
+  .section-title span {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  /* ── ABOUT ── */
+  .about { background: linear-gradient(180deg, var(--dark-bg) 0%, var(--dark-panel) 100%); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .about-visual {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* SVG decorative hexagon grid */
+  .hex-grid {
+    width: 100%; max-width: 480px;
+    aspect-ratio: 1;
+  }
+
+  .about-text { max-width: 520px; }
+  .about-text p {
+    font-size: 17px; line-height: 1.8;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+  .about-text p strong { color: var(--text-main); }
+
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 36px; }
+  .skill-chip {
+    padding: 12px 18px;
+    border: 1px solid rgba(0,245,255,.15);
+    border-radius: 2px;
+    background: rgba(0,245,255,.03);
+    display: flex; align-items: center; gap: 10px;
+    transition: border-color .3s, background .3s, transform .2s;
+    cursor: default;
+  }
+  .skill-chip:hover {
+    border-color: var(--neon-cyan);
+    background: rgba(0,245,255,.08);
+    transform: translateX(4px);
+  }
+  .skill-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 8px var(--neon-cyan);
+    flex-shrink: 0;
+  }
+  .skill-name { font-size: 13px; letter-spacing: 2px; color: var(--text-main); font-weight: 600; }
+
+  /* ── GAMES / PROJECTS ── */
+  .projects { background: var(--dark-bg); }
+  .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+  .game-card {
+    position: relative;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--mid-panel);
+    transition: transform .3s, border-color .3s, box-shadow .3s;
+    cursor: none;
+  }
+  .game-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--neon-pink);
+    box-shadow: 0 20px 60px rgba(255,0,110,.2), 0 0 0 1px rgba(255,0,110,.3);
+  }
+  .game-card-thumb {
+    width: 100%; aspect-ratio: 16/9;
+    position: relative; overflow: hidden;
+  }
+  .game-card-thumb svg {
+    width: 100%; height: 100%;
+    transition: transform .5s;
+  }
+  .game-card:hover .game-card-thumb svg { transform: scale(1.06); }
+
+  .game-card-badge {
+    position: absolute; top: 12px; right: 12px;
+    padding: 4px 10px;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px; letter-spacing: 2px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .badge-rpg { background: rgba(168,85,247,.8); color: #fff; }
+  .badge-fps { background: rgba(255,0,110,.8); color: #fff; }
+  .badge-strategy { background: rgba(0,229,255,.8); color: #000; }
+  .badge-mmo { background: rgba(255,215,0,.8); color: #000; }
+  .badge-indie { background: rgba(34,197,94,.8); color: #fff; }
+  .badge-vr { background: rgba(239,68,68,.8); color: #fff; }
+
+  .game-card-body { padding: 20px; }
+  .game-card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px; font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+  }
+  .game-card-desc {
+    font-size: 13px; color: var(--text-dim);
+    line-height: 1.6; margin-bottom: 16px;
+  }
+  .game-card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .game-tags { display: flex; gap: 6px; }
+  .game-tag {
+    font-size: 10px; letter-spacing: 1px;
+    padding: 3px 8px;
+    border: 1px solid rgba(0,245,255,.2);
+    border-radius: 1px;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', monospace;
+  }
+  .game-year { font-size: 11px; color: var(--text-dim); font-family: 'Orbitron', monospace; }
+
+  /* ── FEATURED GAME (BIG CARD) ── */
+  .featured-game {
+    grid-column: 1 / -1;
+    display: grid; grid-template-columns: 1.5fr 1fr;
+    border: 1px solid rgba(0,245,255,.12);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--mid-panel);
+    transition: transform .3s, box-shadow .3s;
+    cursor: none;
+  }
+  .featured-game:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 80px rgba(0,245,255,.15);
+  }
+  .featured-thumb { position: relative; overflow: hidden; }
+  .featured-thumb svg { width: 100%; height: 100%; min-height: 320px; transition: transform .5s; }
+  .featured-game:hover .featured-thumb svg { transform: scale(1.04); }
+  .featured-body {
+    padding: 48px 40px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .featured-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px; letter-spacing: 5px;
+    color: var(--neon-gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .featured-label::before { content: '★'; font-size: 12px; }
+  .featured-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 32px; font-weight: 900;
+    line-height: 1.1; margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff, var(--neon-cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .featured-desc { font-size: 15px; color: var(--text-dim); line-height: 1.7; margin-bottom: 28px; }
+  .featured-meta { display: flex; gap: 24px; margin-bottom: 32px; }
+  .meta-item { text-align: left; }
+  .meta-val {
+    font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 700;
+    color: var(--neon-cyan);
+  }
+  .meta-key { font-size: 11px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ── SKILLS BARS ── */
+  .skills-section { background: var(--dark-panel); }
+  .skills-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .skill-bars { display: flex; flex-direction: column; gap: 28px; }
+  .skill-bar-item {}
+  .skill-bar-head { display: flex; justify-content: space-between; margin-bottom: 10px; }
+  .skill-bar-name { font-size: 14px; letter-spacing: 2px; color: var(--text-main); font-weight: 600; }
+  .skill-bar-pct { font-family: 'Orbitron', monospace; font-size: 12px; color: var(--neon-cyan); }
+  .skill-bar-track {
+    height: 4px;
+    background: rgba(255,255,255,.06);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .skill-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+    position: relative;
+    animation: fillBar 1.5s cubic-bezier(.25,.46,.45,.94) both;
+    transform-origin: left;
+    box-shadow: 0 0 10px rgba(0,245,255,.5);
+  }
+  @keyframes fillBar {
+    from { width: 0 !important; }
+  }
+  .skill-bar-fill::after {
+    content: '';
+    position: absolute; right: 0; top: -2px;
+    width: 10px; height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--neon-cyan);
+  }
+
+  .skills-visual { position: relative; display: flex; align-items: center; justify-content: center; }
+
+  /* ── EXPERIENCE TIMELINE ── */
+  .timeline-section { background: var(--dark-bg); }
+  .timeline { position: relative; max-width: 800px; margin: 0 auto; }
+  .timeline::before {
+    content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, var(--neon-cyan), var(--neon-pink), var(--neon-cyan));
+    opacity: .3;
+  }
+  .timeline-item {
+    display: flex; gap: 40px; margin-bottom: 56px;
+    padding-left: 0; position: relative;
+  }
+  .timeline-dot {
+    flex-shrink: 0;
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--neon-cyan);
+    background: var(--dark-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px; font-weight: 700;
+    color: var(--neon-cyan);
+    position: relative; z-index: 1;
+    box-shadow: 0 0 20px rgba(0,245,255,.3);
+    flex-direction: column; line-height: 1;
+  }
+  .timeline-content {
+    flex: 1;
+    padding: 24px;
+    border: 1px solid rgba(0,245,255,.1);
+    border-radius: 4px;
+    background: var(--mid-panel);
+    transition: border-color .3s, box-shadow .3s;
+  }
+  .timeline-content:hover {
+    border-color: rgba(0,245,255,.3);
+    box-shadow: 0 0 30px rgba(0,245,255,.08);
+  }
+  .timeline-year {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--neon-pink);
+    margin-bottom: 6px;
+  }
+  .timeline-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px; font-weight: 700;
+    color: var(--text-main); margin-bottom: 4px;
+  }
+  .timeline-sub { font-size: 13px; color: var(--neon-cyan); margin-bottom: 10px; letter-spacing: 1px; }
+  .timeline-desc { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+
+  /* ── CONTACT ── */
+  .contact-section { background: var(--dark-panel); }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+  .contact-info h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .contact-info p { font-size: 15px; color: var(--text-dim); line-height: 1.8; margin-bottom: 36px; }
+  .social-links { display: flex; flex-direction: column; gap: 14px; }
+  .social-link {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 20px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 2px;
+    text-decoration: none;
+    color: var(--text-dim);
+    font-size: 14px; letter-spacing: 1px;
+    transition: border-color .3s, color .3s, transform .2s;
+  }
+  .social-link:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    transform: translateX(6px);
+  }
+  .social-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(0,245,255,.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .contact-form { display: flex; flex-direction: column; gap: 20px; }
+  .form-group { position: relative; }
+  .form-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--neon-cyan);
+    text-transform: uppercase;
+    display: block; margin-bottom: 8px;
+  }
+  .form-input, .form-textarea {
+    width: 100%; padding: 14px 18px;
+    background: rgba(0,245,255,.03);
+    border: 1px solid rgba(0,245,255,.15);
+    border-radius: 2px;
+    color: var(--text-main);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .3s, box-shadow .3s;
+    cursor: none;
+  }
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0,245,255,.1);
+  }
+  .form-textarea { height: 140px; resize: none; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    padding: 32px 8%;
+    border-top: 1px solid rgba(255,255,255,.05);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+  .footer-logo {
+    font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  /* ── NEON DIVIDER ── */
+  .neon-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), var(--neon-purple), transparent);
+    opacity: .4;
+    margin: 0;
+  }
+
+  /* ── CORNER DECORATION ── */
+  .corner-deco {
+    position: absolute;
+    width: 60px; height: 60px;
+    pointer-events: none;
+  }
+  .corner-deco svg { width: 100%; height: 100%; }
+  .corner-tl { top: 24px; left: 24px; }
+  .corner-tr { top: 24px; right: 24px; transform: scaleX(-1); }
+  .corner-bl { bottom: 24px; left: 24px; transform: scaleY(-1); }
+  .corner-br { bottom: 24px; right: 24px; transform: scale(-1,-1); }
+
+  /* ── ANIMATE ON SCROLL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity .7s cubic-bezier(.25,.46,.45,.94), transform .7s cubic-bezier(.25,.46,.45,.94);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity .7s, transform .7s; }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right { opacity: 0; transform: translateX(40px); transition: opacity .7s, transform .7s; }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  /* ── PARTICLE CANVAS ── */
+  #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  /* ── LOADING SCREEN ── */
+  #loader {
+    position: fixed; inset: 0;
+    background: var(--dark-bg);
+    z-index: 9990;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 24px;
+    transition: opacity .6s, visibility .6s;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 36px; font-weight: 900;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: loaderPulse 1s ease-in-out infinite alternate;
+  }
+  @keyframes loaderPulse { from { opacity: .5; } to { opacity: 1; } }
+  .loader-bar-track {
+    width: 280px; height: 2px;
+    background: rgba(255,255,255,.08);
+    border-radius: 2px; overflow: hidden;
+  }
+  .loader-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+    border-radius: 2px;
+    animation: loaderFill 1.8s cubic-bezier(.25,.46,.45,.94) forwards;
+    box-shadow: 0 0 12px var(--neon-cyan);
+  }
+  @keyframes loaderFill { from { width: 0; } to { width: 100%; } }
+  .loader-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px; letter-spacing: 4px;
+    color: var(--text-dim); text-transform: uppercase;
+    animation: loaderBlink 1s ease-in-out infinite alternate;
+  }
+  @keyframes loaderBlink { from { opacity: .3; } to { opacity: 1; } }
+
+  @media (max-width: 900px) {
+    nav { padding: 14px 24px; }
+    .nav-links { gap: 20px; }
+    section { padding: 80px 24px; }
+    .about-grid, .contact-grid, .skills-layout { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .featured-game { grid-template-columns: 1fr; }
+    .hero-content { padding-left: 24px; }
+    .hero-character { display: none; }
+    .hero-stats { left: 24px; }
+    .timeline::before { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="loader-logo">シルフィエット</div>
+  <div class="loader-bar-track"><div class="loader-bar-fill"></div></div>
+  <div class="loader-text">Loading Game Data...</div>
+</div>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<!-- CANVAS -->
+<canvas id="particles"></canvas>
+
+<!-- STARFIELD -->
+<div id="starfield"></div>
+
+<!-- KANJI BG -->
+<div class="kanji-bg" id="kanji-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div>
+    <div class="nav-logo">シルフィエット<span>PORTFOLIO</span></div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Games</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#timeline">XP Log</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg-circle"></div>
+  <div class="hero-ring"></div>
+
+  <!-- HERO CHARACTER IMAGE -->
+  <!-- To change the character image, simply replace "image.png" in the same folder as this HTML file -->
+  <img class="hero-character" src="image.png" alt="Anime Character">
+
+  <div class="hero-content">
+    <div class="hero-tag">SylphieChan // PLAYER ONE</div>
+    <h1 class="hero-title">
+      <span class="line1">SYLPHIETTE<br>CHAN</span>
+      <span class="line2">ANIME & CODE</span>
+    </h1>
+    <p class="hero-desc">
+      Chasing this world is like drinking salty water — the more you drink, the thirstier you get. Anime lover. <strong>Python programmer.</strong> Building <strong>real-world projects</strong> one quest at a time.
+    </p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn-primary">⚔ View My Games</a>
+      <a href="#contact" class="btn-outline">✉ Get In Touch</a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num" id="stat1">0</div>
+      <div class="stat-label">Games Built</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat2">0</div>
+      <div class="stat-label">Players</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat3">0</div>
+      <div class="stat-label">Awards</div>
+    </div>
+  </div>
+
+  <div class="scroll-ind">
+    <div class="scroll-text">Scroll</div>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="neon-divider"></div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-grid">
+    <div class="about-visual reveal-left">
+      <!-- Hexagon / circuit art SVG -->
+      <svg class="hex-grid" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hexG1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#00f5ff" stop-opacity=".6"/>
+            <stop offset="100%" stop-color="#bf00ff" stop-opacity=".3"/>
+          </linearGradient>
+          <filter id="hexGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- central hex -->
+        <polygon points="240,80 310,120 310,200 240,240 170,200 170,120" fill="rgba(0,245,255,.05)" stroke="#00f5ff" stroke-width="1.5" filter="url(#hexGlow)"/>
+        <!-- inner glow hex -->
+        <polygon points="240,100 298,133 298,197 240,230 182,197 182,133" fill="rgba(0,245,255,.08)" stroke="rgba(0,245,255,.3)" stroke-width="1"/>
+        <!-- center icon -->
+        <text x="240" y="175" text-anchor="middle" font-family="Noto Sans JP" font-size="60" fill="#00f5ff" opacity=".8">龍</text>
+
+        <!-- outer hex ring -->
+        <polygon points="240,20 340,75 340,185 240,240 140,185 140,75" fill="none" stroke="rgba(0,245,255,.15)" stroke-width="1" stroke-dasharray="8,4"/>
+
+        <!-- 6 satellite hexagons -->
+        <!-- top -->
+        <polygon points="240,22 268,38 268,68 240,84 212,68 212,38" fill="rgba(255,0,110,.08)" stroke="#ff006e" stroke-width="1"/>
+        <text x="240" y="60" text-anchor="middle" font-family="Orbitron" font-size="9" fill="#ff006e" letter-spacing="1">UNITY</text>
+        <!-- top-right -->
+        <polygon points="328,72 356,88 356,118 328,134 300,118 300,88" fill="rgba(0,245,255,.06)" stroke="#00f5ff" stroke-width="1"/>
+        <text x="328" y="110" text-anchor="middle" font-family="Orbitron" font-size="9" fill="#00f5ff" letter-spacing="1">C#</text>
+        <!-- bottom-right -->
+        <polygon points="328,192 356,208 356,238 328,254 300,238 300,208" fill="rgba(168,85,247,.08)" stroke="#a855f7" stroke-width="1"/>
+        <text x="328" y="230" text-anchor="middle" font-family="Orbitron" font-size="9" fill="#a855f7" letter-spacing="1">SHADER</text>
+        <!-- bottom -->
+        <polygon points="240,252 268,268 268,298 240,314 212,298 212,268" fill="rgba(255,215,0,.06)" stroke="#ffd700" stroke-width="1"/>
+        <text x="240" y="290" text-anchor="middle" font-family="Orbitron" font-size="9" fill="#ffd700" letter-spacing="1">BLENDER</text>
+        <!-- bottom-left -->
+        <polygon points="152,192 180,208 180,238 152,254 124,238 124,208" fill="rgba(0,245,255,.06)" stroke="#00f5ff" stroke-width="1"/>
+        <text x="152" y="230" text-anchor="middle" font-family="Orbitron" font-size="8" fill="#00f5ff" letter-spacing="1">UNREAL</text>
+        <!-- top-left -->
+        <polygon points="152,72 180,88 180,118 152,134 124,118 124,88" fill="rgba(255,0,110,.06)" stroke="#ff006e" stroke-width="1"/>
+        <text x="152" y="110" text-anchor="middle" font-family="Orbitron" font-size="9" fill="#ff006e" letter-spacing="1">PIXEL</text>
+
+        <!-- connecting lines -->
+        <line x1="240" y1="84" x2="240" y2="100" stroke="#00f5ff" stroke-width="1" opacity=".4"/>
+        <line x1="300" y1="88" x2="298" y2="133" stroke="#00f5ff" stroke-width="1" opacity=".4"/>
+        <line x1="300" y1="208" x2="298" y2="197" stroke="#a855f7" stroke-width="1" opacity=".4"/>
+        <line x1="240" y1="268" x2="240" y2="240" stroke="#ffd700" stroke-width="1" opacity=".4"/>
+        <line x1="180" y1="208" x2="182" y2="197" stroke="#00f5ff" stroke-width="1" opacity=".4"/>
+        <line x1="180" y1="88" x2="182" y2="133" stroke="#ff006e" stroke-width="1" opacity=".4"/>
+
+        <!-- outer decorative rings -->
+        <circle cx="240" cy="160" r="170" fill="none" stroke="rgba(0,245,255,.06)" stroke-width="1" stroke-dasharray="4,8"/>
+        <circle cx="240" cy="160" r="200" fill="none" stroke="rgba(255,0,110,.04)" stroke-width="1"/>
+
+        <!-- floating dots on orbit -->
+        <circle cx="240" cy="0" r="4" fill="#00f5ff" opacity=".6" filter="url(#hexGlow)">
+          <animateTransform attributeName="transform" type="rotate" from="0 240 160" to="360 240 160" dur="12s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="70" cy="160" r="3" fill="#ff006e" opacity=".5">
+          <animateTransform attributeName="transform" type="rotate" from="0 240 160" to="-360 240 160" dur="18s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="240" cy="0" r="2" fill="#ffd700" opacity=".4">
+          <animateTransform attributeName="transform" type="rotate" from="120 240 160" to="480 240 160" dur="8s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+
+    <div class="about-text reveal-right">
+      <div class="section-label">About Me</div>
+      <h2 class="section-title">I Watch Anime & <span>Write Code</span></h2>
+      <p>
+        <strong>Sylphiette</strong> (SylphieChan) — I like to watch anime and my hobbies are programming, going running with a friend, and studying.
+      </p>
+      <p>
+        Learning and building <strong>real-world projects</strong> from scratch. Currently working on an e-commerce startup targeting small towns and mastering the art of Python.
+      </p>
+      <p>
+        Fueled by anime marathons, the dream of <strong>MIT</strong>, and the relentless pursuit of learning Japanese.
+      </p>
+      <div class="skills-grid">
+        <div class="skill-chip"><div class="skill-dot"></div><span class="skill-name">Python</span></div>
+        <div class="skill-chip"><div class="skill-dot" style="background:var(--neon-pink);box-shadow:0 0 8px var(--neon-pink)"></div><span class="skill-name">Watching Anime</span></div>
+        <div class="skill-chip"><div class="skill-dot" style="background:var(--neon-purple);box-shadow:0 0 8px var(--neon-purple)"></div><span class="skill-name">Japanese (Learning)</span></div>
+        <div class="skill-chip"><div class="skill-dot" style="background:var(--neon-gold);box-shadow:0 0 8px var(--neon-gold)"></div><span class="skill-name">Running</span></div>
+        <div class="skill-chip"><div class="skill-dot"></div><span class="skill-name">Programming</span></div>
+        <div class="skill-chip"><div class="skill-dot" style="background:var(--neon-pink);box-shadow:0 0 8px var(--neon-pink)"></div><span class="skill-name">Studying</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="neon-divider"></div>
+
+<!-- PROJECTS -->
+<section class="projects" id="projects">
+  <div class="section-label reveal">Games Portfolio</div>
+  <h2 class="section-title reveal"><span>My</span> Creations</h2>
+
+  <div class="projects-grid">
+
+    <!-- FEATURED GAME -->
+    <div class="featured-game reveal">
+      <div class="featured-thumb">
+        <!-- SVG scene art for featured game -->
+        <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000510"/>
+              <stop offset="100%" stop-color="#080030"/>
+            </linearGradient>
+            <linearGradient id="moonG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#e0f0ff"/>
+              <stop offset="100%" stop-color="#a0c0ff"/>
+            </linearGradient>
+            <filter id="cityGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <radialGradient id="moonHalo" cx="50%" cy="50%" r="50%">
+              <stop offset="60%" stop-color="transparent"/>
+              <stop offset="100%" stop-color="rgba(120,180,255,.15)"/>
+            </radialGradient>
+          </defs>
+          <rect width="700" height="380" fill="url(#skyG)"/>
+
+          <!-- Stars -->
+          <circle cx="50" cy="30" r="1" fill="white" opacity=".6"/>
+          <circle cx="120" cy="15" r="1.5" fill="white" opacity=".8"/>
+          <circle cx="200" cy="40" r="1" fill="white" opacity=".5"/>
+          <circle cx="350" cy="20" r="1" fill="white" opacity=".7"/>
+          <circle cx="500" cy="10" r="1.5" fill="white" opacity=".6"/>
+          <circle cx="620" cy="35" r="1" fill="white" opacity=".4"/>
+          <circle cx="680" cy="20" r="1" fill="white" opacity=".7"/>
+          <circle cx="80" cy="60" r="1" fill="white" opacity=".5"/>
+          <circle cx="440" cy="50" r="1" fill="white" opacity=".6"/>
+
+          <!-- Moon -->
+          <circle cx="580" cy="70" r="45" fill="url(#moonHalo)"/>
+          <circle cx="580" cy="70" r="35" fill="url(#moonG)" opacity=".9"/>
+          <circle cx="590" cy="60" r="30" fill="#000c20" opacity=".15"/>
+
+          <!-- Distant mountains -->
+          <path d="M0 260 L80 160 L160 240 L240 140 L320 200 L400 120 L480 180 L560 100 L640 160 L700 130 L700 380 L0 380Z" fill="#08001a"/>
+          <path d="M0 280 L100 200 L180 260 L260 180 L340 230 L420 160 L500 210 L580 140 L660 190 L700 170 L700 380 L0 380Z" fill="#0c0025"/>
+
+          <!-- City skyline -->
+          <g fill="#080018" stroke="none">
+            <!-- buildings -->
+            <rect x="0" y="240" width="40" height="140"/>
+            <rect x="45" y="200" width="30" height="180"/>
+            <rect x="80" y="220" width="50" height="160"/>
+            <rect x="135" y="180" width="35" height="200"/>
+            <rect x="175" y="210" width="45" height="170"/>
+            <rect x="225" y="160" width="40" height="220"/>
+            <rect x="270" y="230" width="30" height="150"/>
+            <rect x="305" y="190" width="55" height="190"/>
+            <rect x="365" y="170" width="35" height="210"/>
+            <rect x="405" y="240" width="40" height="140"/>
+            <rect x="450" y="200" width="30" height="180"/>
+            <rect x="485" y="215" width="60" height="165"/>
+            <rect x="550" y="180" width="40" height="200"/>
+            <rect x="595" y="230" width="50" height="150"/>
+            <rect x="650" y="200" width="50" height="180"/>
+          </g>
+
+          <!-- Building windows -->
+          <g fill="#00f5ff" opacity=".7" filter="url(#cityGlow)">
+            <rect x="8" y="260" width="6" height="4"/><rect x="18" y="260" width="6" height="4"/>
+            <rect x="8" y="272" width="6" height="4"/><rect x="18" y="272" width="6" height="4"/>
+            <rect x="52" y="215" width="5" height="3"/><rect x="62" y="215" width="5" height="3"/>
+            <rect x="52" y="225" width="5" height="3"/><rect x="62" y="225" width="5" height="3"/>
+            <rect x="90" y="235" width="6" height="4"/><rect x="102" y="235" width="6" height="4"/>
+            <rect x="90" y="248" width="6" height="4"/><rect x="102" y="248" width="6" height="4"/>
+            <rect x="140" y="195" width="5" height="3"/><rect x="150" y="195" width="5" height="3"/>
+            <rect x="140" y="206" width="5" height="3"/><rect x="150" y="206" width="5" height="3"/>
+            <rect x="233" y="175" width="6" height="4"/><rect x="245" y="175" width="6" height="4"/>
+            <rect x="233" y="188" width="6" height="4"/><rect x="245" y="188" width="6" height="4"/>
+            <rect x="310" y="200" width="8" height="5"/><rect x="325" y="200" width="8" height="5"/>
+            <rect x="340" y="200" width="8" height="5"/>
+            <rect x="310" y="213" width="8" height="5"/><rect x="325" y="213" width="8" height="5"/>
+            <rect x="372" y="185" width="6" height="4"/><rect x="384" y="185" width="6" height="4"/>
+            <rect x="372" y="198" width="6" height="4"/><rect x="384" y="198" width="6" height="4"/>
+            <rect x="493" y="225" width="8" height="5"/><rect x="508" y="225" width="8" height="5"/>
+            <rect x="523" y="225" width="8" height="5"/>
+            <rect x="493" y="238" width="8" height="5"/><rect x="508" y="238" width="8" height="5"/>
+            <rect x="558" y="192" width="6" height="4"/><rect x="570" y="192" width="6" height="4"/>
+            <rect x="558" y="205" width="6" height="4"/><rect x="570" y="205" width="6" height="4"/>
+            <rect x="660" y="215" width="8" height="5"/><rect x="675" y="215" width="8" height="5"/>
+            <rect x="660" y="228" width="8" height="5"/><rect x="675" y="228" width="8" height="5"/>
+          </g>
+          <!-- Pink/magenta accent windows -->
+          <g fill="#ff006e" opacity=".5">
+            <rect x="28" y="284" width="5" height="3"/>
+            <rect x="72" y="248" width="5" height="3"/>
+            <rect x="182" y="225" width="5" height="3"/>
+            <rect x="415" y="255" width="5" height="3"/>
+            <rect x="603" y="245" width="5" height="3"/>
+          </g>
+
+          <!-- Glowing ground/street -->
+          <rect x="0" y="340" width="700" height="40" fill="#050010"/>
+          <rect x="0" y="338" width="700" height="3" fill="#00f5ff" opacity=".15"/>
+          <!-- Street reflections -->
+          <line x1="0" y1="345" x2="700" y2="345" stroke="rgba(0,245,255,.05)" stroke-width="1"/>
+
+          <!-- Foreground figure silhouette -->
+          <g opacity=".9">
+            <ellipse cx="350" cy="330" rx="18" ry="10" fill="rgba(0,245,255,.08)"/>
+            <rect x="342" y="280" width="16" height="52" rx="3" fill="#060012"/>
+            <ellipse cx="350" cy="272" rx="14" ry="14" fill="#060012"/>
+            <!-- coat tails -->
+            <path d="M342 320 L330 345" stroke="#060012" stroke-width="8" stroke-linecap="round"/>
+            <path d="M358 320 L370 345" stroke="#060012" stroke-width="8" stroke-linecap="round"/>
+            <!-- glowing eyes on silhouette -->
+            <circle cx="344" cy="270" r="2.5" fill="#00f5ff" filter="url(#cityGlow)" opacity=".9"/>
+            <circle cx="356" cy="270" r="2.5" fill="#00f5ff" filter="url(#cityGlow)" opacity=".9"/>
+            <!-- sword -->
+            <line x1="362" y1="295" x2="400" y2="255" stroke="#00f5ff" stroke-width="2" opacity=".8" filter="url(#cityGlow)"/>
+            <line x1="362" y1="295" x2="400" y2="255" stroke="#fff" stroke-width="1" opacity=".9"/>
+          </g>
+
+          <!-- Title overlay -->
+          <text x="40" y="345" font-family="Orbitron" font-size="28" font-weight="900" fill="#fff" opacity=".95" letter-spacing="3">NEON RONIN</text>
+          <text x="40" y="365" font-family="Rajdhani" font-size="13" fill="rgba(0,245,255,.7)" letter-spacing="3">CYBERPUNK ACTION RPG</text>
+        </svg>
+      </div>
+      <div class="featured-body">
+        <div class="featured-label">Featured Project</div>
+        <h3 class="featured-title">E-Commerce Startup</h3>
+        <p class="featured-desc">A lightweight, local-focused e-commerce system targeting small towns like Minchinabad. It connects nearby shopkeepers with online customers, offers low-cost delivery, and features a basic reward system. Not built like big platforms — it's minimal, fast, and simple.</p>
+        <div class="featured-meta">
+          <div class="meta-item"><div class="meta-val">🚧</div><div class="meta-key">Status</div></div>
+          <div class="meta-item"><div class="meta-val">Local</div><div class="meta-key">Scope</div></div>
+          <div class="meta-item"><div class="meta-val">2026</div><div class="meta-key">Year</div></div>
+        </div>
+        <a href="#" class="btn-primary">⚔ View Project</a>
+      </div>
+    </div>
+
+    <!-- GAME CARD 1 -->
+    <div class="game-card reveal">
+      <div class="game-card-thumb">
+        <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="dungeonG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0a0015"/>
+              <stop offset="100%" stop-color="#000"/>
+            </linearGradient>
+            <filter id="dg"><feGaussianBlur stdDeviation="2"/></filter>
+          </defs>
+          <rect width="400" height="225" fill="url(#dungeonG)"/>
+          <!-- dungeon grid floor -->
+          <g stroke="rgba(168,85,247,.15)" stroke-width="1" fill="none">
+            <line x1="0" y1="80" x2="400" y2="80"/>
+            <line x1="0" y1="120" x2="400" y2="120"/>
+            <line x1="0" y1="160" x2="400" y2="160"/>
+            <line x1="0" y1="200" x2="400" y2="200"/>
+            <line x1="80" y1="80" x2="80" y2="225"/>
+            <line x1="160" y1="80" x2="160" y2="225"/>
+            <line x1="240" y1="80" x2="240" y2="225"/>
+            <line x1="320" y1="80" x2="320" y2="225"/>
+          </g>
+          <!-- torches -->
+          <g>
+            <rect x="58" y="55" width="4" height="15" fill="#8b4513"/>
+            <ellipse cx="60" cy="52" rx="8" ry="12" fill="rgba(255,140,0,.4)"/>
+            <ellipse cx="60" cy="50" rx="4" ry="7" fill="#ff8c00" opacity=".8"/>
+            <rect x="178" y="55" width="4" height="15" fill="#8b4513"/>
+            <ellipse cx="180" cy="52" rx="8" ry="12" fill="rgba(255,140,0,.4)"/>
+            <ellipse cx="180" cy="50" rx="4" ry="7" fill="#ff8c00" opacity=".8"/>
+          </g>
+          <!-- hero pixel art -->
+          <g transform="translate(180, 100)">
+            <rect x="-8" y="-20" width="16" height="16" rx="2" fill="#f5d5b0"/>
+            <rect x="-10" y="-4" width="20" height="24" rx="2" fill="#4444aa"/>
+            <rect x="-14" y="-2" width="8" height="18" rx="1" fill="#3333aa"/>
+            <rect x="6" y="-2" width="8" height="18" rx="1" fill="#3333aa"/>
+            <rect x="-8" y="20" width="8" height="14" rx="1" fill="#2a2a8a"/>
+            <rect x="0" y="20" width="8" height="14" rx="1" fill="#2a2a8a"/>
+            <!-- sword -->
+            <rect x="12" y="-10" width="2" height="28" rx="1" fill="#c0c0c0"/>
+            <rect x="8" y="2" width="10" height="2" rx="1" fill="#ffd700"/>
+          </g>
+          <!-- monster -->
+          <g transform="translate(300, 120)">
+            <ellipse cx="0" cy="0" rx="28" ry="22" fill="#440066"/>
+            <circle cx="-8" cy="-6" r="6" fill="#ff006e"/>
+            <circle cx="8" cy="-6" r="6" fill="#ff006e"/>
+            <circle cx="-8" cy="-6" r="3" fill="#fff"/>
+            <circle cx="8" cy="-6" r="3" fill="#fff"/>
+            <path d="M-12 8 Q0 16 12 8" stroke="#ff006e" stroke-width="2" fill="none"/>
+          </g>
+          <!-- spell effect -->
+          <ellipse cx="240" cy="130" rx="30" ry="15" fill="none" stroke="#a855f7" stroke-width="2" opacity=".6" filter="url(#dg)"/>
+          <text x="200" y="210" font-family="Orbitron" font-size="16" font-weight="700" fill="#a855f7" letter-spacing="2">ABYSS KEEPER</text>
+        </svg>
+        <span class="game-card-badge badge-rpg">RPG</span>
+      </div>
+      <div class="game-card-body">
+        <div class="game-card-title">Learning Programming</div>
+        <div class="game-card-desc">i hope it ends soon ;-; Currently grinding through code, building projects, and leveling up skills one bug at a time.</div>
+        <div class="game-card-footer">
+          <div class="game-tags"><span class="game-tag">PYTHON</span><span class="game-tag">CODE</span></div>
+          <span class="game-year">In Progress</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME CARD 2 -->
+    <div class="game-card reveal">
+      <div class="game-card-thumb">
+        <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="spaceG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000015"/>
+              <stop offset="100%" stop-color="#050010"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="225" fill="url(#spaceG)"/>
+          <!-- nebula -->
+          <ellipse cx="200" cy="100" rx="200" ry="100" fill="rgba(0,100,255,.06)"/>
+          <ellipse cx="300" cy="80" rx="120" ry="80" fill="rgba(255,0,110,.04)"/>
+          <!-- stars -->
+          <circle cx="30" cy="20" r="1" fill="white" opacity=".8"/>
+          <circle cx="80" cy="50" r="1.5" fill="white" opacity=".6"/>
+          <circle cx="150" cy="15" r="1" fill="white" opacity=".9"/>
+          <circle cx="300" cy="30" r="1" fill="white" opacity=".7"/>
+          <circle cx="380" cy="60" r="1" fill="white" opacity=".5"/>
+          <!-- planet -->
+          <circle cx="310" cy="70" r="50" fill="#1a0050"/>
+          <ellipse cx="310" cy="70" rx="60" ry="12" fill="none" stroke="rgba(0,245,255,.3)" stroke-width="2"/>
+          <circle cx="310" cy="70" r="50" fill="none" stroke="rgba(168,85,247,.2)" stroke-width="1"/>
+          <!-- spaceship -->
+          <g transform="translate(140, 120) rotate(-15)">
+            <path d="M0,-30 L15,10 L8,10 L8,25 L-8,25 L-8,10 L-15,10Z" fill="#00aadd"/>
+            <path d="M-8,10 L-25,20 L-20,10Z" fill="#0088bb"/>
+            <path d="M8,10 L25,20 L20,10Z" fill="#0088bb"/>
+            <ellipse cx="0" cy="-5" rx="6" ry="8" fill="#00f5ff" opacity=".6"/>
+            <!-- engine glow -->
+            <ellipse cx="0" cy="25" rx="5" ry="12" fill="#ff6600" opacity=".8"/>
+            <ellipse cx="0" cy="28" rx="3" ry="8" fill="#ffaa00" opacity=".9"/>
+          </g>
+          <!-- laser beam -->
+          <line x1="155" y1="100" x2="290" y2="60" stroke="#00f5ff" stroke-width="2" opacity=".7"/>
+          <ellipse cx="293" cy="59" rx="8" ry="8" fill="rgba(0,245,255,.3)"/>
+          <text x="20" y="210" font-family="Orbitron" font-size="16" font-weight="700" fill="#00f5ff" letter-spacing="2">VOID STRIKER</text>
+        </svg>
+        <span class="game-card-badge badge-fps">SHOOTER</span>
+      </div>
+      <div class="game-card-body">
+        <div class="game-card-title">Learning Japanese</div>
+        <div class="game-card-desc">Diving deep into Kanji, Hiragana, and Katakana. Unlocking a new language to get closer to the anime source material — and maybe move to Japan someday.</div>
+        <div class="game-card-footer">
+          <div class="game-tags"><span class="game-tag">日本語</span><span class="game-tag">SKILL</span></div>
+          <span class="game-year">In Progress</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME CARD 3 -->
+    <div class="game-card reveal">
+      <div class="game-card-thumb">
+        <svg viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="forestG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#001510"/>
+              <stop offset="100%" stop-color="#000a08"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="225" fill="url(#forestG)"/>
+          <!-- trees silhouette -->
+          <g fill="#002510">
+            <path d="M0 225 L0 100 L20 160 L30 80 L50 150 L65 60 L85 130 L100 40 L120 120 L140 30 L160 110 L180 50 L200 100 L220 40 L240 110 L260 60 L280 130 L300 80 L320 140 L340 70 L360 130 L380 90 L400 140 L400 225Z"/>
+          </g>
+          <!-- glowing spirits -->
+          <circle cx="120" cy="120" r="12" fill="rgba(0,255,150,.2)">
+            <animate attributeName="r" values="10;16;10" dur="3s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="120" cy="120" r="5" fill="#00ff96" opacity=".8"/>
+          <circle cx="280" cy="140" r="10" fill="rgba(0,200,255,.2)">
+            <animate attributeName="r" values="8;14;8" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="280" cy="140" r="4" fill="#00e5ff" opacity=".8"/>
+          <!-- runes on ground -->
+          <ellipse cx="200" cy="200" rx="80" ry="12" fill="none" stroke="rgba(0,255,150,.2)" stroke-width="1"/>
+          <text x="20" y="218" font-family="Orbitron" font-size="14" font-weight="700" fill="#00ff96" letter-spacing="2">SPIRIT GROVE</text>
+        </svg>
+        <span class="game-card-badge badge-indie">INDIE</span>
+      </div>
+      <div class="game-card-body">
+        <div class="game-card-title">Road to MIT</div>
+        <div class="game-card-desc">Preparing to go to MIT — studying hard, building projects, and leveling up every day. The final boss of this arc is that acceptance letter.</div>
+        <div class="game-card-footer">
+          <div class="game-tags"><span class="game-tag">STUDY</span><span class="game-tag">DREAM</span></div>
+          <span class="game-year">2025</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="neon-divider"></div>
+
+<!-- SKILLS -->
+<section class="skills-section" id="skills">
+  <div class="skills-layout">
+    <div>
+      <div class="section-label reveal">Technical Power</div>
+      <h2 class="section-title reveal">Skill <span>Level</span></h2>
+      <div class="skill-bars">
+        <div class="skill-bar-item reveal">
+          <div class="skill-bar-head"><span class="skill-bar-name">Python</span><span class="skill-bar-pct">75%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:75%"></div></div>
+        </div>
+        <div class="skill-bar-item reveal">
+          <div class="skill-bar-head"><span class="skill-bar-name">Watching Anime</span><span class="skill-bar-pct">100%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--neon-purple),var(--neon-pink))"></div></div>
+        </div>
+        <div class="skill-bar-item reveal">
+          <div class="skill-bar-head"><span class="skill-bar-name">Japanese (Learning)</span><span class="skill-bar-pct">40%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:40%;background:linear-gradient(90deg,var(--neon-gold),#ff6600)"></div></div>
+        </div>
+        <div class="skill-bar-item reveal">
+          <div class="skill-bar-head"><span class="skill-bar-name">Running</span><span class="skill-bar-pct">80%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%;background:linear-gradient(90deg,#ff6600,var(--neon-pink))"></div></div>
+        </div>
+        <div class="skill-bar-item reveal">
+          <div class="skill-bar-head"><span class="skill-bar-name">Studying</span><span class="skill-bar-pct">85%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:85%;background:linear-gradient(90deg,var(--neon-pink),var(--neon-cyan))"></div></div>
+        </div>
+        <div class="skill-bar-item reveal">
+          <div class="skill-bar-head"><span class="skill-bar-name">Problem Solving</span><span class="skill-bar-pct">78%</span></div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:78%;background:linear-gradient(90deg,var(--neon-purple),#0088ff)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="skills-visual reveal-right">
+      <!-- Radar chart SVG -->
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="max-width:400px;width:100%">
+        <defs>
+          <linearGradient id="radarFill" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#00f5ff" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#ff006e" stop-opacity=".2"/>
+          </linearGradient>
+        </defs>
+        <!-- grid rings -->
+        <g stroke="rgba(255,255,255,.06)" stroke-width="1" fill="none">
+          <polygon points="200,40 342,120 342,280 200,360 58,280 58,120"/>
+          <polygon points="200,72 318,140 318,260 200,328 82,260 82,140"/>
+          <polygon points="200,104 294,160 294,240 200,296 106,240 106,160"/>
+          <polygon points="200,136 270,180 270,220 200,264 130,220 130,180"/>
+        </g>
+        <!-- axis lines -->
+        <g stroke="rgba(255,255,255,.06)" stroke-width="1">
+          <line x1="200" y1="40" x2="200" y2="360"/>
+          <line x1="342" y1="120" x2="58" y2="280"/>
+          <line x1="342" y1="280" x2="58" y2="120"/>
+        </g>
+        <!-- data polygon: Unity96 ShaderArt82 Pixel91 Sound74 UE88 3D79 -->
+        <!-- mapped to hex vertices -->
+        <polygon
+          points="200,56 333,134 328,265 200,316 84,252 88,140"
+          fill="url(#radarFill)"
+          stroke="#00f5ff"
+          stroke-width="2"
+          stroke-linejoin="round"
+        />
+        <!-- dots on vertices -->
+        <circle cx="200" cy="56" r="5" fill="#00f5ff" filter="url(#glow2)"/>
+        <circle cx="333" cy="134" r="5" fill="#a855f7" filter="url(#glow2)"/>
+        <circle cx="328" cy="265" r="5" fill="#ff006e" filter="url(#glow2)"/>
+        <circle cx="200" cy="316" r="5" fill="#ffd700" filter="url(#glow2)"/>
+        <circle cx="84" cy="252" r="5" fill="#00ff96" filter="url(#glow2)"/>
+        <circle cx="88" cy="140" r="5" fill="#00f5ff" filter="url(#glow2)"/>
+
+        <!-- labels -->
+        <text x="200" y="30" text-anchor="middle" font-family="Orbitron" font-size="10" fill="#00f5ff" letter-spacing="1">UNITY</text>
+        <text x="365" y="125" text-anchor="start" font-family="Orbitron" font-size="10" fill="#a855f7" letter-spacing="1">SHADER</text>
+        <text x="355" y="285" text-anchor="start" font-family="Orbitron" font-size="10" fill="#ff006e" letter-spacing="1">PIXEL</text>
+        <text x="200" y="382" text-anchor="middle" font-family="Orbitron" font-size="10" fill="#ffd700" letter-spacing="1">SOUND</text>
+        <text x="32" y="285" text-anchor="end" font-family="Orbitron" font-size="10" fill="#00ff96" letter-spacing="1">UE5</text>
+        <text x="42" y="130" text-anchor="end" font-family="Orbitron" font-size="10" fill="#00f5ff" letter-spacing="1">3D</text>
+
+        <!-- center label -->
+        <text x="200" y="195" text-anchor="middle" font-family="Noto Sans JP" font-size="32" fill="rgba(0,245,255,.15)" font-weight="700">龍</text>
+        <text x="200" y="215" text-anchor="middle" font-family="Orbitron" font-size="9" fill="rgba(255,255,255,.2)" letter-spacing="3">SKILL RADAR</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="neon-divider"></div>
+
+<!-- TIMELINE -->
+<section class="timeline-section" id="timeline">
+  <div class="section-label reveal">Experience Log</div>
+  <h2 class="section-title reveal" style="text-align:center"><span>XP</span> Timeline</h2>
+  <div class="timeline">
+    <div class="timeline-item reveal">
+      <div class="timeline-dot">'25</div>
+      <div class="timeline-content">
+        <div class="timeline-year">2025 — PRESENT</div>
+        <div class="timeline-title">Building E-Commerce Startup</div>
+        <div class="timeline-sub">Solo Project — Minchinabad Focus</div>
+        <div class="timeline-desc">Building a lightweight, local-focused e-commerce system that connects nearby shopkeepers with online customers, offers low-cost delivery, and features a basic reward system. Minimal, fast, and simple.</div>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot">'25</div>
+      <div class="timeline-content">
+        <div class="timeline-year">2025 — PRESENT</div>
+        <div class="timeline-title">Learning Japanese</div>
+        <div class="timeline-sub">Self-Study / Online Resources</div>
+        <div class="timeline-desc">Actively learning Japanese — Hiragana, Katakana, and Kanji. Motivated by a love of anime and a dream to one day experience Japan firsthand.</div>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot">'25</div>
+      <div class="timeline-content">
+        <div class="timeline-year">2025 — PRESENT</div>
+        <div class="timeline-title">Learning Programming</div>
+        <div class="timeline-sub">Self-Taught — Python & Beyond</div>
+        <div class="timeline-desc">i hope it ends soon ;-; Grinding through programming concepts, building real projects, and leveling up skills one bug at a time. Key skill: Python.</div>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot">'∞'</div>
+      <div class="timeline-content">
+        <div class="timeline-year">GOAL — FUTURE</div>
+        <div class="timeline-title">Preparing for MIT</div>
+        <div class="timeline-sub">Cambridge, Massachusetts</div>
+        <div class="timeline-desc">The ultimate quest. Studying hard, building a strong portfolio, and chasing the dream of attending the Massachusetts Institute of Technology.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="neon-divider"></div>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="section-label reveal">Get In Touch</div>
+  <h2 class="section-title reveal">Start A <span>Quest</span></h2>
+  <div class="contact-grid">
+    <div class="contact-info reveal-left">
+      <h3>Let's start a new adventure!</h3>
+      <p>Whether you want to collaborate, talk anime, swap stories about programming, or just say hi — I'm always open for a new quest. Age: 369 YO. Location: Home.</p>
+      <div class="social-links">
+        <a href="https://github.com/prashant69696969" target="_blank" class="social-link"><div class="social-icon">🐙</div> GitHub — @SylphieChan</a>
+        <a href="https://www.linkedin.com/in/sylphie-chan-a49a9327b/" target="_blank" class="social-link"><div class="social-icon">💼</div> LinkedIn — Sylphie Chan</a>
+        <a href="https://discord.com/users" target="_blank" class="social-link"><div class="social-icon">🎮</div> Discord — 1or.1</a>
+        <a href="mailto:sylphiechan@proton.me" class="social-link"><div class="social-icon">📧</div> sylphiechan@proton.me</a>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div class="contact-form">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" placeholder="Player One">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="hero@adventure.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" placeholder="Tell me about your quest..."></textarea>
+        </div>
+        <button class="btn-primary" style="width:100%;justify-content:center;cursor:none">⚡ Send Message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">SYLPHIETTE</div>
+  <div>© 2026 Sylphiette (SylphieChan) // Made with ❤️ and lots of Love</div>
+  <div style="font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--text-dim)">GAME ON</div>
+</footer>
+
+<script>
+// ── LOADER ──
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 2000);
+});
+
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const trail  = document.getElementById('cursor-trail');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top  = e.clientY + 'px';
+  setTimeout(() => {
+    trail.style.left = e.clientX + 'px';
+    trail.style.top  = e.clientY + 'px';
+  }, 80);
+});
+document.querySelectorAll('a, button, .game-card, .skill-chip').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '36px'; cursor.style.height = '36px';
+    cursor.style.background = 'rgba(0,245,255,.15)';
+    cursor.style.borderColor = 'var(--neon-pink)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '18px'; cursor.style.height = '18px';
+    cursor.style.background = 'transparent';
+    cursor.style.borderColor = 'var(--neon-cyan)';
+  });
+});
+
+// ── STARFIELD ──
+const sf = document.getElementById('starfield');
+for (let i = 0; i < 120; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2.5 + .5;
+  s.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%; top:${Math.random()*100}%;
+    --d:${(Math.random()*4+2).toFixed(1)}s;
+    --o:${(Math.random()*.8+.1).toFixed(2)};
+    animation-delay:${(Math.random()*4).toFixed(1)}s;
+  `;
+  sf.appendChild(s);
+}
+
+// ── KANJI BACKGROUND ──
+const kanji = ['龍','星','力','夢','剣','炎','闘','光','魂','神','風','雷','血','戦','技'];
+const kb = document.getElementById('kanji-bg');
+kanji.forEach((k, i) => {
+  const el = document.createElement('div');
+  el.className = 'kanji-float';
+  el.textContent = k;
+  el.style.cssText = `
+    left:${(i*7+5)%95}%; top:${(i*13+10)%90}%;
+    --kd:${(Math.random()*8+6).toFixed(1)}s;
+    --kr:${(Math.random()*30-15).toFixed(1)}deg;
+    animation-delay:${(i*0.5).toFixed(1)}s;
+  `;
+  kb.appendChild(el);
+});
+
+// ── PARTICLE CANVAS ──
+const canvas = document.getElementById('particles');
+const ctx    = canvas.getContext('2d');
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const particles = [];
+for (let i = 0; i < 50; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - .5) * .4,
+    vy: (Math.random() - .5) * .4,
+    size: Math.random() * 1.5 + .3,
+    color: ['#00f5ff','#ff006e','#bf00ff','#ffd700'][Math.floor(Math.random()*4)],
+    alpha: Math.random() * .6 + .1,
+  });
+}
+
+function animParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha;
+    ctx.shadowBlur = 8; ctx.shadowColor = p.color;
+    ctx.fill();
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+  });
+  // connect nearby
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i+1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const d  = Math.sqrt(dx*dx + dy*dy);
+      if (d < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = 'rgba(0,245,255,' + (1-d/120)*0.08 + ')';
+        ctx.lineWidth = .5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+// ── SCROLL REVEAL ──
+const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: .1 });
+reveals.forEach(r => io.observe(r));
+
+// ── COUNTER ANIMATION ──
+function animCount(el, target, suffix='', dur=1800) {
+  let start = null;
+  const step = (ts) => {
+    if (!start) start = ts;
+    const p = Math.min((ts-start)/dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.floor(ease * target) + suffix;
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+const heroIO = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) {
+    setTimeout(() => {
+      animCount(document.getElementById('stat1'), 24);
+      animCount(document.getElementById('stat2'), 200, 'K+');
+      animCount(document.getElementById('stat3'), 7);
+    }, 800);
+    heroIO.disconnect();
+  }
+}, { threshold: .3 });
+heroIO.observe(document.querySelector('.hero-stats'));
+
+// ── PARALLAX ON MOUSE ──
+document.addEventListener('mousemove', e => {
+  const x = (e.clientX / window.innerWidth  - .5) * 2;
+  const y = (e.clientY / window.innerHeight - .5) * 2;
+  const char = document.querySelector('.hero-character');
+  if (char) char.style.transform = `translateY(calc(var(--float,0px) + ${y*-8}px)) translateX(${x*6}px)`;
+});
+
+// ── GLITCH TEXT HOVER ──
+document.querySelectorAll('.game-card-title').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    el.style.textShadow = '2px 0 var(--neon-pink), -2px 0 var(--neon-cyan)';
+    setTimeout(() => el.style.textShadow = '', 200);
+  });
+});
+</script>
+</body>
+</html>
