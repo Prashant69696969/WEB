@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYLPHIETTE — THE GREATEST ESTATE DEVELOPER</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --gold:#C9A84C;--gold-l:#F0D78C;--gold-d:#8B6914;
+  --parch:#F5EDD6;--ink:#0D0904;
+  --red:#7A1010;--emerald:#0A3020;
+  --stone:#1A140A;--stone2:#2C2010;
+}
+
+/* ═══════════════ BODY ═══════════════ */
+body{font-family:'EB Garamond',serif;background:#0D0904;color:var(--parch);overflow-x:hidden}
+
+/* ═══════════════ SCROLLBAR ═══════════════ */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0D0904}
+::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:3px}
+
+/* ═══════════════ GLOBAL WORLD BACKGROUND — REAL CASTLE PHOTOGRAPH ═══════════════ */
+#world-bg{
+  position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:#0A0703; /* shows instantly while the photo loads */
+}
+
+/* The actual photograph — illuminated castle estate at dusk.
+   object-fit:cover keeps it sharp and uncropped-looking at any screen size;
+   srcset/sizes (added on the <img> tag) request the right resolution per device
+   so it always looks crisp, never soft or upscaled. */
+.bg-photo-layer{
+  position:absolute;inset:0;width:100%;height:100%;overflow:hidden;
+  will-change:transform;
+}
+.bg-photo{
+  position:absolute;top:50%;left:50%;
+  width:100%;height:100%;
+  min-width:100%;min-height:100%;
+  object-fit:cover;object-position:center 35%;
+  transform:translate(-50%,-50%) scale(1.04); /* slight overscan hides edge softening on pan */
+  filter:
+    saturate(0.85)        /* keep some of the moonlit blue, but not garish */
+    contrast(1.08)
+    brightness(0.78)      /* this art is already dark — don't crush it further */
+    sepia(0.06);           /* just a whisper of warmth toward the gold palette */
+}
+
+/* Color-grade wash: tints the whole photo toward the site's gold/black palette
+   so it reads as "this site's background", not "a random stock photo pasted in". */
+.bg-grade{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,rgba(10,7,3,0.55) 0%,rgba(10,7,3,0.15) 30%,rgba(20,12,4,0.35) 65%,rgba(8,4,2,0.85) 100%),
+    radial-gradient(ellipse 90% 60% at 50% 100%,rgba(8,4,2,0.9) 0%,transparent 60%),
+    linear-gradient(180deg,rgba(58,30,10,0.18) 0%,transparent 40%);
+  mix-blend-mode:normal;
+}
+/* A second, subtler gold wash so the warm tones of the site (var(--gold)) feel
+   like they belong to this photo rather than sitting on top of it. */
+.bg-gold-wash{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 65% 20%,rgba(201,168,76,0.16) 0%,transparent 60%);
+  mix-blend-mode:soft-light;
+}
+
+/* Vignette — keeps the edges dark so foreground text/cards stay readable
+   no matter where the camera (photo) draws the eye. */
+.vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 100% 100% at 50% 38%,transparent 30%,rgba(5,3,1,0.78) 100%);
+}
+
+/* Fine grain overlay — keeps the dark areas from looking like flat color blocks
+   next to a real photograph, and ties the photo + UI together visually. */
+.bg-grain{
+  position:absolute;inset:0;opacity:0.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Slow ambient drift, applied to the <img> itself (not the wrapper, which JS
+   drives on scroll) — barely perceptible, makes the photo feel alive rather
+   than a static pasted image, with zero conflict with the scroll parallax. */
+@keyframes bgDrift{
+  0%{ transform:translate(-50%,-50%) scale(1.04) }
+  100%{ transform:translate(-50%,-50%) scale(1.085) }
+}
+.bg-photo{ animation:bgDrift 50s ease-in-out infinite alternate; }
+
+
+/* Low fog drifting across the lower third, in front of the photo */
+.fog{
+  position:absolute;bottom:0%;left:-15%;right:-15%;height:22%;
+  background:linear-gradient(0deg,rgba(8,4,2,0.5) 0%,transparent 100%);
+  animation:driftFog 24s ease-in-out infinite alternate;
+}
+.fog2{
+  position:absolute;bottom:6%;left:-20%;right:-20%;height:14%;
+  background:linear-gradient(0deg,rgba(201,168,76,0.05) 0%,transparent 100%);
+  animation:driftFog 32s ease-in-out infinite alternate-reverse;
+}
+@keyframes driftFog{0%{transform:translateX(-5%)}100%{transform:translateX(5%)}}
+
+/* Golden floating particles, drifting in front of the photo for depth */
+.particles-wrap{position:absolute;inset:0;overflow:hidden}
+.pt{position:absolute;border-radius:50%;background:var(--gold-l);animation:floatUp linear infinite;opacity:0}
+@keyframes floatUp{
+  0%{opacity:0;transform:translateY(100vh) rotate(0deg)}
+  10%{opacity:0.7}90%{opacity:0.2}
+  100%{opacity:0;transform:translateY(-80px) rotate(720deg)}
+}
+
+
+
+/* ═══════════════ NAV ═══════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:64px;padding:0 5vw;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(8,4,2,0.88);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(201,168,76,0.18);
+  transition:background 0.3s;
+}
+.nav-brand{
+  font-family:'Cinzel',serif;font-size:14px;font-weight:900;
+  letter-spacing:0.25em;color:var(--gold);text-decoration:none;
+  display:flex;align-items:center;gap:0.6rem;
+}
+.nav-brand span{opacity:0.5;font-weight:400}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{
+  font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:0.18em;
+  color:rgba(245,237,214,0.5);text-decoration:none;text-transform:uppercase;
+  transition:color 0.25s;position:relative;padding-bottom:2px;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;
+}
+.nav-links a:hover{color:var(--gold)}
+.nav-links a:hover::after{transform:scaleX(1)}
+
+/* ═══════════════ SCROLL ANIMATIONS ═══════════════ */
+.sa{opacity:0;transform:translateY(50px);transition:opacity 0.9s cubic-bezier(.4,0,.2,1),transform 0.9s cubic-bezier(.4,0,.2,1)}
+.sa.from-left{transform:translateX(-60px)}
+.sa.from-right{transform:translateX(60px)}
+.sa.scale-in{transform:scale(0.88)}
+.sa.visible{opacity:1;transform:none}
+.sa.d1{transition-delay:0.1s}.sa.d2{transition-delay:0.2s}
+.sa.d3{transition-delay:0.3s}.sa.d4{transition-delay:0.4s}
+.sa.d5{transition-delay:0.5s}.sa.d6{transition-delay:0.6s}
+
+/* ═══════════════ SECTION UTILS ═══════════════ */
+.w{max-width:1200px;margin:0 auto;padding:0 6vw;position:relative;z-index:1}
+.sec-label{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.4em;
+  color:var(--gold);text-transform:uppercase;opacity:0.75;
+  display:flex;align-items:center;gap:0.75rem;
+}
+.sec-label::before,.sec-label::after{
+  content:'';display:block;height:1px;width:40px;
+  background:linear-gradient(90deg,transparent,var(--gold));
+}
+.sec-label::after{background:linear-gradient(270deg,transparent,var(--gold))}
+.sec-title{
+  font-family:'Cinzel',serif;font-size:clamp(2rem,4vw,3rem);font-weight:900;
+  line-height:1.1;color:var(--parch);
+}
+.sec-title .g{color:var(--gold)}
+.sec-sub{font-size:1.05rem;color:rgba(245,237,214,0.5);font-style:italic;line-height:1.7}
+.gold-divider{
+  display:flex;align-items:center;gap:1rem;
+  margin:1.5rem auto;opacity:0.35;width:fit-content;
+}
+.gold-divider::before,.gold-divider::after{
+  content:'';width:80px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.gold-divider i{color:var(--gold);font-size:13px}
+
+/* ═══════════════ HERO ═══════════════ */
+#hero{
+  position:relative;z-index:1;
+  min-height:100vh;padding:90px 6vw 5rem;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;gap:4rem;max-width:1300px;margin:0 auto;
+}
+.hero-eye{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.5em;
+  color:var(--gold);text-transform:uppercase;display:block;margin-bottom:1.25rem;
+  display:flex;align-items:center;gap:0.5rem;opacity:0.85;
+}
+.h1{
+  font-family:'Cinzel',serif;font-size:clamp(3rem,5.5vw,5.5rem);
+  font-weight:900;line-height:1.0;color:var(--parch);margin-bottom:0.15rem;
+}
+.h1 .g{color:var(--gold);display:block}
+.hero-role{
+  font-family:'Cinzel',serif;font-size:clamp(0.9rem,1.6vw,1.2rem);
+  color:rgba(245,237,214,0.4);letter-spacing:0.2em;font-style:italic;margin-bottom:2rem;
+}
+.hero-quote{
+  font-size:1.1rem;line-height:1.85;color:rgba(245,237,214,0.72);
+  max-width:480px;margin-bottom:2.25rem;
+  padding:1rem 1.25rem;
+  background:rgba(201,168,76,0.04);
+  border-left:2px solid var(--gold);
+  position:relative;
+}
+.hero-quote .q-mark{
+  font-family:'Cinzel',serif;font-size:3rem;color:var(--gold);
+  opacity:0.15;position:absolute;top:-0.5rem;left:0.25rem;line-height:1;
+}
+.hero-quote strong{color:var(--gold-l);font-weight:600}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:3rem}
+.btn-g{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.18em;
+  padding:0.8rem 1.8rem;background:var(--gold);color:#0D0904;
+  border:none;text-decoration:none;font-weight:700;cursor:pointer;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  transition:background 0.25s,transform 0.2s;display:inline-block;
+}
+.btn-g:hover{background:var(--gold-l);transform:translateY(-2px)}
+.btn-o{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.18em;
+  padding:0.8rem 1.8rem;background:transparent;color:var(--gold);
+  border:1px solid rgba(201,168,76,0.4);text-decoration:none;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  transition:all 0.25s;display:inline-block;
+}
+.btn-o:hover{background:rgba(201,168,76,0.08);border-color:var(--gold)}
+.hero-stats{display:flex;gap:3rem;padding-top:2rem;border-top:1px solid rgba(201,168,76,0.12)}
+.stat-n{font-family:'Cinzel',serif;font-size:2rem;font-weight:900;color:var(--gold);display:block;line-height:1}
+.stat-l{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.15em;color:rgba(245,237,214,0.35);text-transform:uppercase;margin-top:0.3rem}
+
+/* Portrait */
+.portrait-wrap{display:flex;justify-content:center;align-items:center;position:relative}
+.portrait-outer{
+  position:relative;width:400px;height:520px;
+}
+.portrait-outer::before{
+  content:'';position:absolute;inset:-12px;
+  border:1px solid rgba(201,168,76,0.12);
+  clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);
+}
+.portrait-outer::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(201,168,76,0.07) 0%,transparent 70%);
+  pointer-events:none;
+}
+.p-img{
+  width:100%;height:100%;object-fit:cover;object-position:top center;
+  filter:sepia(0.15) contrast(1.08) brightness(0.95);display:block;
+  clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);
+}
+.p-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 50%,rgba(8,4,2,0.85) 100%);
+  clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);
+}
+.p-corner{position:absolute;width:24px;height:24px;border-color:var(--gold);border-style:solid;opacity:0.65}
+.p-corner.tl{top:0;left:0;border-width:2px 0 0 2px}
+.p-corner.tr{top:0;right:0;border-width:2px 2px 0 0}
+.p-corner.bl{bottom:0;left:0;border-width:0 0 2px 2px}
+.p-corner.br{bottom:0;right:0;border-width:0 2px 2px 0}
+.p-caption{position:absolute;bottom:1.25rem;left:0;right:0;text-align:center;padding:0 1rem}
+.p-name{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;color:var(--gold);letter-spacing:0.2em;display:block}
+.p-sub{font-size:0.78rem;color:rgba(245,237,214,0.4);letter-spacing:0.1em;font-style:italic}
+.p-glow{
+  position:absolute;inset:-40px;z-index:-1;
+  background:radial-gradient(ellipse,rgba(201,168,76,0.09) 0%,transparent 65%);
+}
+/* Scroll hint */
+.scroll-hint{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:4px;opacity:0.3;
+  animation:fadeInUp 1s 1.8s both;
+}
+.scroll-line{width:1px;height:36px;background:linear-gradient(180deg,transparent,var(--gold));animation:scrollPulse 2s infinite}
+@keyframes scrollPulse{0%,100%{opacity:0.3}50%{opacity:1}}
+.scroll-txt{font-family:'Cinzel',serif;font-size:8px;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase}
+@keyframes fadeInUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:0.3;transform:translateX(-50%) translateY(0)}}
+
+/* ═══════════════ CHARACTER SPOTLIGHT — between sections ═══════════════ */
+.char-spotlight{
+  position:relative;z-index:1;
+  padding:5rem 0;overflow:hidden;
+}
+.char-bg-strip{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(201,168,76,0.03) 40%,rgba(201,168,76,0.05) 50%,rgba(201,168,76,0.03) 60%,transparent 100%);
+}
+.char-inner{
+  max-width:1200px;margin:0 auto;padding:0 6vw;
+  display:flex;align-items:center;gap:4rem;
+}
+.char-inner.rev{flex-direction:row-reverse}
+.char-img-wrap{
+  flex-shrink:0;width:260px;height:340px;position:relative;
+}
+.char-frame{
+  width:100%;height:100%;overflow:hidden;
+  clip-path:polygon(15px 0,100% 0,100% calc(100% - 15px),calc(100% - 15px) 100%,0 100%,0 15px);
+  border:1px solid rgba(201,168,76,0.2);
+}
+.char-frame img{
+  width:100%;height:100%;object-fit:cover;object-position:top center;
+  filter:sepia(0.2) contrast(1.1);transition:transform 0.6s;
+}
+.char-frame img:hover{transform:scale(1.04)}
+.char-frame-corner{position:absolute;width:16px;height:16px;border-color:var(--gold);border-style:solid;opacity:0.7}
+.char-frame-corner.tl{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.char-frame-corner.tr{top:-1px;right:-1px;border-width:2px 2px 0 0}
+.char-frame-corner.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px}
+.char-frame-corner.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.char-fallback{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:0.75rem;
+  background:linear-gradient(135deg,rgba(28,18,8,0.8),rgba(15,10,4,0.9));
+  border:1px solid rgba(201,168,76,0.15);
+}
+.char-fallback .cf-icon{font-size:3.5rem;opacity:0.3;color:var(--gold)}
+.char-fallback .cf-name{font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.2em;color:rgba(201,168,76,0.5);text-transform:uppercase}
+.char-info{flex:1}
+.char-role-tag{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.3em;
+  color:var(--gold);text-transform:uppercase;opacity:0.7;
+  display:inline-block;border:1px solid rgba(201,168,76,0.25);
+  padding:0.25rem 0.6rem;margin-bottom:0.75rem;
+}
+.char-name{
+  font-family:'Cinzel',serif;font-size:clamp(1.5rem,3vw,2.2rem);
+  font-weight:900;color:var(--parch);margin-bottom:0.2rem;
+}
+.char-alias{
+  font-size:0.9rem;color:rgba(245,237,214,0.35);font-style:italic;
+  margin-bottom:1rem;letter-spacing:0.05em;
+}
+.char-desc{
+  font-size:1rem;line-height:1.8;color:rgba(245,237,214,0.65);
+  border-left:2px solid rgba(201,168,76,0.25);padding-left:1rem;font-style:italic;
+  margin-bottom:1.25rem;
+}
+.char-traits{display:flex;flex-wrap:wrap;gap:0.5rem}
+.trait{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.12em;
+  padding:0.25rem 0.65rem;border:1px solid rgba(201,168,76,0.22);
+  color:rgba(201,168,76,0.65);text-transform:uppercase;
+}
+
+/* ═══════════════ ABOUT ═══════════════ */
+#about{position:relative;z-index:1;padding:6rem 0}
+.about-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 80% 50%,rgba(122,30,30,0.05) 0%,transparent 70%);
+}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.about-text p{font-size:1.05rem;line-height:1.9;color:rgba(245,237,214,0.72);margin-bottom:1.25rem}
+.about-text strong{color:var(--gold-l);font-weight:600}
+.noble-card{
+  background:rgba(20,13,6,0.7);
+  border:1px solid rgba(201,168,76,0.14);
+  padding:1.5rem;position:relative;
+}
+.noble-card::before{
+  content:'';position:absolute;inset:6px;
+  border:1px solid rgba(201,168,76,0.05);pointer-events:none;
+}
+.noble-card-title{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.3em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:1.25rem;opacity:0.75;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.noble-card-title::after{content:'';flex:1;height:1px;background:rgba(201,168,76,0.2)}
+.nr{display:flex;justify-content:space-between;font-size:0.9rem;padding:0.65rem 0;border-bottom:1px solid rgba(201,168,76,0.07)}
+.nr:last-child{border-bottom:none}
+.nk{color:rgba(245,237,214,0.4);font-style:italic}
+.nv{color:var(--parch);font-weight:600}
+.hobbies{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:1.75rem}
+.hb{
+  background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);
+  padding:0.55rem 0.9rem;font-size:0.85rem;color:rgba(245,237,214,0.65);
+  text-align:center;font-style:italic;transition:all 0.25s;cursor:default;
+}
+.hb:hover{border-color:rgba(201,168,76,0.35);color:var(--gold-l);background:rgba(201,168,76,0.09)}
+
+/* ═══════════════ QUESTS ═══════════════ */
+#quests{position:relative;z-index:1;padding:6rem 0}
+.quests-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,transparent 0%,rgba(10,48,32,0.04) 50%,transparent 100%);
+}
+.quests-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:1.25rem;margin-top:0}
+.qcard{
+  background:rgba(16,11,6,0.75);
+  border:1px solid rgba(201,168,76,0.14);
+  position:relative;overflow:hidden;
+  transition:border-color 0.3s,transform 0.3s,box-shadow 0.3s;
+  display:flex;flex-direction:column;
+}
+.qcard:hover{
+  border-color:rgba(201,168,76,0.38);
+  transform:translateY(-5px);
+  box-shadow:0 25px 60px rgba(0,0,0,0.5),0 0 30px rgba(201,168,76,0.04);
+}
+.qcard.vyron{
+  grid-column:1/-1;
+  display:grid;grid-template-columns:1fr 1fr;border-color:rgba(201,168,76,0.25);
+}
+.qcard.vyron:hover{border-color:rgba(201,168,76,0.55)}
+.qcard-shine{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(201,168,76,0.04) 0%,transparent 60%);
+}
+.qcard-top-bar{height:2px;background:linear-gradient(90deg,transparent,var(--gold-d),transparent);opacity:0.5}
+.vyron .qcard-top-bar{background:linear-gradient(90deg,transparent,var(--gold),var(--gold),transparent);opacity:0.8}
+.qcard-head{padding:1.5rem 1.5rem 1rem}
+.qarc{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;opacity:0.6;display:block;margin-bottom:0.4rem}
+.qname{font-family:'Cinzel',serif;font-size:1.25rem;font-weight:700;color:var(--parch);line-height:1.2}
+.vyron .qname{font-size:1.6rem}
+.qbadge{
+  display:inline-flex;align-items:center;gap:0.35rem;
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.1em;
+  padding:0.25rem 0.65rem;margin-top:0.6rem;border:1px solid;
+}
+.qbadge.active{color:#5BC77E;border-color:rgba(91,199,126,0.3);background:rgba(91,199,126,0.05)}
+.qbadge.active::before{content:'';width:5px;height:5px;border-radius:50%;background:#5BC77E;animation:glowPulse 2s infinite}
+@keyframes glowPulse{0%,100%{opacity:1;box-shadow:0 0 4px #5BC77E}50%{opacity:0.4;box-shadow:none}}
+.qbadge.soon{color:rgba(201,168,76,0.7);border-color:rgba(201,168,76,0.25);background:rgba(201,168,76,0.04)}
+.qcard-body{padding:0 1.5rem 1.5rem;flex:1;display:flex;flex-direction:column}
+.qdesc{font-size:0.95rem;line-height:1.75;color:rgba(245,237,214,0.55);font-style:italic;margin-bottom:1.25rem}
+.qtags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem}
+.qtag{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.12em;
+  padding:0.22rem 0.55rem;border:1px solid rgba(201,168,76,0.2);
+  color:rgba(201,168,76,0.6);text-transform:uppercase;
+}
+.qlink{
+  margin-top:auto;display:inline-flex;align-items:center;gap:0.5rem;
+  font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:0.15em;
+  color:var(--gold);text-decoration:none;
+  padding-bottom:2px;border-bottom:1px solid rgba(201,168,76,0.28);
+  transition:all 0.25s;width:fit-content;
+}
+.qlink:hover{gap:0.9rem;border-color:var(--gold)}
+/* Vyron side */
+.vyron-side{
+  background:rgba(201,168,76,0.03);
+  border-left:1px solid rgba(201,168,76,0.1);
+  padding:2rem;display:flex;flex-direction:column;justify-content:space-between;
+}
+.vyron-icon{
+  font-family:'Cinzel',serif;font-size:5rem;
+  color:var(--gold);opacity:0.08;text-align:center;line-height:1;
+  margin-bottom:1.5rem;
+}
+.vy-meta{display:flex;flex-direction:column;gap:1rem}
+.vy-m-row{display:flex;justify-content:space-between;font-size:0.88rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(201,168,76,0.08)}
+.vy-m-row:last-child{border-bottom:none;padding-bottom:0}
+.vy-mk{color:rgba(245,237,214,0.35);font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.15em;text-transform:uppercase}
+.vy-mv{color:var(--parch);font-weight:600;text-align:right}
+.vyron-quote{
+  margin-top:2rem;font-size:0.85rem;line-height:1.6;
+  color:rgba(245,237,214,0.25);font-style:italic;text-align:center;border-top:1px solid rgba(201,168,76,0.07);padding-top:1.25rem;
+}
+
+/* ═══════════════ SKILLS ═══════════════ */
+#skills{position:relative;z-index:1;padding:6rem 0}
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem}
+.sk{
+  background:rgba(16,11,6,0.65);border:1px solid rgba(201,168,76,0.1);
+  padding:1rem 1.25rem;transition:border-color 0.25s;
+}
+.sk:hover{border-color:rgba(201,168,76,0.28)}
+.sk-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.55rem}
+.sk-name{font-family:'Cinzel',serif;font-size:0.85rem;color:var(--parch);letter-spacing:0.04em}
+.sk-pct{font-family:'Cinzel',serif;font-size:0.85rem;color:var(--gold);font-weight:700}
+.sk-track{height:2px;background:rgba(201,168,76,0.1);position:relative}
+.sk-fill{
+  position:absolute;inset:0 auto 0 0;width:0%;
+  background:linear-gradient(90deg,var(--gold-d),var(--gold));
+  transition:width 1.4s cubic-bezier(.4,0,.2,1);
+}
+.sk-fill::after{
+  content:'';position:absolute;right:-1px;top:-3px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gold-l);box-shadow:0 0 6px var(--gold);
+}
+
+/* ═══════════════ TIMELINE ═══════════════ */
+#ledger{position:relative;z-index:1;padding:6rem 0}
+.timeline{position:relative;max-width:820px;margin:0 auto}
+.timeline::before{
+  content:'';position:absolute;left:110px;top:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(201,168,76,0.25) 8%,rgba(201,168,76,0.25) 92%,transparent);
+}
+.tl-item{display:grid;grid-template-columns:110px 1fr;margin-bottom:2.75rem;position:relative}
+.tl-yr{padding-right:1.75rem;text-align:right;padding-top:0.2rem}
+.tl-yr span{font-family:'Cinzel',serif;font-size:0.82rem;font-weight:700;color:var(--gold);opacity:0.65}
+.tl-dot{
+  position:absolute;left:107px;top:5px;width:7px;height:7px;
+  border:1px solid var(--gold);background:var(--stone);transform:rotate(45deg);
+}
+.tl-content{padding-left:2rem}
+.tl-type{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.28em;color:var(--gold);text-transform:uppercase;opacity:0.55;display:block;margin-bottom:0.3rem}
+.tl-title{font-family:'Cinzel',serif;font-size:1.08rem;font-weight:700;color:var(--parch);margin-bottom:0.2rem}
+.tl-sub{font-size:0.8rem;color:rgba(245,237,214,0.32);font-style:italic;margin-bottom:0.65rem;letter-spacing:0.04em}
+.tl-desc{font-size:0.95rem;line-height:1.72;color:rgba(245,237,214,0.58);border-left:1px solid rgba(201,168,76,0.2);padding-left:1rem;font-style:italic}
+
+/* ═══════════════ CONTACT ═══════════════ */
+#contact{position:relative;z-index:1;padding:6rem 0 8rem}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.contact-h{font-family:'Cinzel',serif;font-size:1.3rem;font-weight:700;color:var(--parch);margin-bottom:0.65rem}
+.contact-p{font-size:1rem;line-height:1.75;color:rgba(245,237,214,0.55);margin-bottom:2rem;font-style:italic}
+.clinks{display:flex;flex-direction:column;gap:0.75rem}
+.clink{
+  display:flex;align-items:center;gap:0.9rem;
+  padding:0.8rem 1.1rem;background:rgba(201,168,76,0.03);
+  border:1px solid rgba(201,168,76,0.1);text-decoration:none;
+  color:rgba(245,237,214,0.65);font-size:0.9rem;transition:all 0.25s;
+}
+.clink:hover{border-color:rgba(201,168,76,0.32);color:var(--gold-l);background:rgba(201,168,76,0.07);transform:translateX(4px)}
+.clink-icon{
+  width:34px;height:34px;border:1px solid rgba(201,168,76,0.18);
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;
+}
+.clink-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.2em;color:var(--gold);display:block;margin-bottom:0.1rem;text-transform:uppercase}
+/* Form */
+.scroll-form{
+  background:rgba(14,9,4,0.6);border:1px solid rgba(201,168,76,0.14);padding:1.75rem;position:relative;
+}
+.scroll-form::after{content:'';position:absolute;inset:7px;border:1px solid rgba(201,168,76,0.05);pointer-events:none}
+.form-ttl{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:1.5rem;opacity:0.8}
+.ff{margin-bottom:0.9rem}
+.fl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.25em;color:rgba(201,168,76,0.55);display:block;margin-bottom:0.35rem;text-transform:uppercase}
+.fi,.fta{
+  width:100%;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.14);
+  color:var(--parch);font-family:'EB Garamond',serif;font-size:0.95rem;
+  padding:0.7rem 0.9rem;outline:none;transition:border-color 0.25s;
+}
+.fi:focus,.fta:focus{border-color:rgba(201,168,76,0.4)}
+.fi::placeholder,.fta::placeholder{color:rgba(245,237,214,0.18);font-style:italic}
+.fta{resize:vertical;min-height:100px}
+.fsub{
+  width:100%;margin-top:0.4rem;font-family:'Cinzel',serif;font-size:11px;
+  letter-spacing:0.2em;padding:0.8rem;background:var(--gold);color:#0D0904;
+  border:none;font-weight:700;text-transform:uppercase;cursor:pointer;transition:all 0.25s;
+}
+.fsub:hover{background:var(--gold-l);transform:translateY(-1px)}
+
+/* ═══════════════ FOOTER ═══════════════ */
+footer{
+  position:relative;z-index:1;border-top:1px solid rgba(201,168,76,0.1);
+  padding:2.5rem 5vw;text-align:center;
+  background:rgba(6,4,2,0.5);
+}
+.fc{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);font-weight:700;letter-spacing:0.3em;margin-bottom:0.4rem}
+.fp{font-size:0.8rem;color:rgba(245,237,214,0.2);font-style:italic;letter-spacing:0.06em}
+
+/* ═══════════════ RESPONSIVE ═══════════════ */
+@media(max-width:880px){
+  #hero{grid-template-columns:1fr;padding:80px 6vw 4rem;text-align:center}
+  .hero-right{order:-1}
+  .portrait-outer{width:260px;height:340px}
+  .hero-quote{margin:0 auto 2rem}
+  .hero-stats{justify-content:center}
+  .about-grid,.contact-grid{grid-template-columns:1fr;gap:2.5rem}
+  .skills-grid{grid-template-columns:1fr}
+  .qcard.vyron{grid-column:auto;grid-template-columns:1fr}
+  .vyron-side{border-left:none;border-top:1px solid rgba(201,168,76,0.1)}
+  .char-inner,.char-inner.rev{flex-direction:column}
+  .char-img-wrap{width:200px;height:260px}
+  nav{padding:0 1.5rem}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ WORLD BACKGROUND — REAL CASTLE PHOTOGRAPH ════════════ -->
+<!-- Background art: user-provided night village/castle painting, bundled
+     locally in images/estate-village-night.jpg so it always loads with the
+     page (no external dependency). Falls back to a real castle photo if the
+     local file is ever missing. -->
+<div id="world-bg" aria-hidden="true">
+  <div class="bg-photo-layer">
+    <img class="bg-photo" id="bg-photo-img"
+      src="images/estate-village-night.jpg"
+      alt="The estate village at night — site background"
+      onerror="this.onerror=null;this.src='https://images.pexels.com/photos/28103868/pexels-photo-28103868.jpeg?auto=compress&cs=tinysrgb&w=1920&q=85';">
+  </div>
+  <div class="bg-grade"></div>
+  <div class="bg-gold-wash"></div>
+  <div class="fog"></div>
+  <div class="fog2"></div>
+  <div class="vignette"></div>
+  <div class="bg-grain"></div>
+  <div class="particles-wrap" id="pts"></div>
+</div>
+
+<!-- ════════════ NAV ════════════ -->
+<nav>
+  <a href="#hero" class="nav-brand">⚜ SYLPHIETTE <span>· THE GREATEST ESTATE DEVELOPER</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">The Noble</a></li>
+    <li><a href="#quests">Grand Projects</a></li>
+    <li><a href="#skills">Skill Tree</a></li>
+    <li><a href="#ledger">Estate Ledger</a></li>
+    <li><a href="#contact">Send a Raven</a></li>
+  </ul>
+</nav>
+
+<!-- ════════════ HERO ════════════ -->
+<section id="hero" style="position:relative;z-index:1">
+  <div class="hero-left">
+    <span class="hero-eye sa d1">⚜ &nbsp; House SylphieChan &nbsp;·&nbsp; Est. 2025</span>
+    <h1 class="h1 sa d2">SYLPHIETTE<span class="g">CHAN</span></h1>
+    <p class="hero-role sa d2">Anime Scholar · Python Programmer · Dream Chaser</p>
+    <div class="hero-quote sa d3">
+      <span class="q-mark">"</span>
+      Chasing this world is like drinking salty water — the more you drink, the thirstier you get. Yet I drink still, for the estate must be built.
+      <br><br>
+      <strong>Python programmer</strong> · <strong>Anime devotee</strong> · Building <strong>real-world projects</strong> one quest at a time.
+    </div>
+    <div class="hero-btns sa d4">
+      <a href="#quests" class="btn-g">⚔ View Grand Projects</a>
+      <a href="#contact" class="btn-o">✉ Send a Raven</a>
+    </div>
+    <div class="hero-stats sa d5">
+      <div>
+        <span class="stat-n" id="ctr-proj">0</span>
+        <span class="stat-l">Projects Built</span>
+      </div>
+      <div>
+        <span class="stat-n">369</span>
+        <span class="stat-l">YO Noble</span>
+      </div>
+      <div>
+        <span class="stat-n">∞</span>
+        <span class="stat-l">Quests Remain</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="portrait-wrap sa from-right d2">
+    <div style="display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap">
+
+      <!-- Center: main portrait, the noble herself -->
+      <div class="portrait-outer">
+        <div class="p-glow"></div>
+        <img class="p-img" id="hero-img"
+          src="https://www.sylphiechan.in/image.png"
+          alt="Sylphiette — The Greatest Estate Developer"
+          onerror="this.style.display='none';document.getElementById('hero-fallback').style.display='flex';">
+        <div class="p-overlay"></div>
+        <div class="p-corner tl"></div><div class="p-corner tr"></div>
+        <div class="p-corner bl"></div><div class="p-corner br"></div>
+        <div class="p-caption">
+          <span class="p-name">SYLPHIETTE CHAN</span>
+          <span class="p-sub">Python Programmer · Anime Scholar · Dream Chaser</span>
+        </div>
+        <div id="hero-fallback" style="display:none;position:absolute;inset:0;background:rgba(201,168,76,0.04);align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+          <div style="font-size:4rem;opacity:0.2;color:var(--gold)">⚜</div>
+          <span style="font-family:'Cinzel',serif;font-size:0.85rem;color:rgba(201,168,76,0.4);letter-spacing:0.2em">SYLPHIETTE</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span class="scroll-txt">Scroll</span>
+  </div>
+</section>
+
+<!-- ════════════ CHARACTER SPOTLIGHT 1 — Lloyd Frontera ════════════ -->
+<div class="char-spotlight">
+  <div class="char-bg-strip"></div>
+  <div class="char-inner w" style="max-width:1100px">
+    <div class="char-img-wrap sa from-left">
+      <div class="char-frame">
+        <div class="char-fallback">
+          <div class="cf-icon">⚔</div>
+          <div class="cf-name">Lloyd Frontera</div>
+        </div>
+      </div>
+      <div class="char-frame-corner tl"></div><div class="char-frame-corner tr"></div>
+      <div class="char-frame-corner bl"></div><div class="char-frame-corner br"></div>
+    </div>
+    <div class="char-info sa d2">
+      <span class="char-role-tag">⚔ Main Protagonist</span>
+      <h3 class="char-name">Lloyd Frontera</h3>
+      <p class="char-alias">Kim Suho · The Greatest Estate Developer · Civil Engineer reborn as noble</p>
+      <p class="char-desc">
+        A first-class civil engineer who woke up inside a novel as Lloyd Frontera — a broke, lazy nobleman deep in debt. Armed with modern engineering knowledge and sheer cunning, he transforms a crumbling estate into a legendary domain. A schemer? Absolutely. A visionary? Without question.
+      </p>
+      <div class="char-traits">
+        <span class="trait">Engineering Genius</span>
+        <span class="trait">Strategic Mind</span>
+        <span class="trait">Debt Obliterator</span>
+        <span class="trait">Estate Builder</span>
+        <span class="trait">Isekaid Noble</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ ABOUT ════════════ -->
+<section id="about">
+  <div class="about-bg"></div>
+  <div class="w">
+    <div class="section-header" style="text-align:center;margin-bottom:3.5rem">
+      <div class="gold-divider"><i>⚜</i></div>
+      <span class="sec-label" style="justify-content:center">Chapter I &nbsp;·&nbsp; The Noble's Chronicle</span>
+      <h2 class="sec-title sa" style="margin-top:0.5rem">About <span class="g">The Noble</span></h2>
+      <p class="sec-sub sa d1">Every great estate begins with a story. Here is mine.</p>
+    </div>
+    <div class="about-grid">
+      <div>
+        <div class="about-text">
+          <p class="sa d1">I am <strong>Sylphiette (SylphieChan)</strong> — an anime devotee, a Python practitioner, and a builder of real-world systems. Like a newly reincarnated estate lord surveying untamed land, I approach every project as an opportunity to build something from nothing.</p>
+          <p class="sa d2">Currently developing an <strong>e-commerce startup</strong> targeting small towns like Minchinabad — connecting nearby shopkeepers with online customers through a lightweight, minimal, and fast system. Not grand platforms; a precisely crafted estate for the people.</p>
+          <p class="sa d3">Fueled by <strong>anime marathons</strong>, the dream of <strong>MIT</strong>, and the relentless pursuit of learning Japanese. Every line of code is another stone laid in the foundation of something greater.</p>
+        </div>
+        <div class="hobbies sa d3">
+          <div class="hb">⛩ Watching Anime</div>
+          <div class="hb">🐍 Python Programming</div>
+          <div class="hb">日 Learning Japanese</div>
+          <div class="hb">🏃 Running</div>
+          <div class="hb">📚 Studying</div>
+          <div class="hb">⚗ Building Projects</div>
+        </div>
+      </div>
+      <div class="sa from-right d2">
+        <div class="noble-card">
+          <div class="noble-card-title">⚜ Noble Register</div>
+          <div class="nr"><span class="nk">Title</span><span class="nv">Greatest Estate Developer</span></div>
+          <div class="nr"><span class="nk">House Name</span><span class="nv">SylphieChan</span></div>
+          <div class="nr"><span class="nk">Age</span><span class="nv">369 YO (Legendary)</span></div>
+          <div class="nr"><span class="nk">Domain</span><span class="nv">Home Territory</span></div>
+          <div class="nr"><span class="nk">Primary Weapon</span><span class="nv">Python</span></div>
+          <div class="nr"><span class="nk">Guild Email</span><span class="nv" style="font-size:0.82rem">sylphiechan@proton.me</span></div>
+          <div class="nr"><span class="nk">Status</span><span class="nv" style="color:#5BC77E">● Active Quest</span></div>
+          <div class="nr"><span class="nk">Final Boss</span><span class="nv">MIT Acceptance</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ CHARACTER SPOTLIGHT 2 — Javier ════════════ -->
+<div class="char-spotlight">
+  <div class="char-bg-strip"></div>
+  <div class="char-inner rev" style="max-width:1100px;margin:0 auto;padding:0 6vw">
+    <div class="char-img-wrap sa from-right">
+      <div class="char-frame">
+        <div class="char-fallback">
+          <div class="cf-icon">🛡</div>
+          <div class="cf-name">Javier Asrahan</div>
+        </div>
+      </div>
+      <div class="char-frame-corner tl"></div><div class="char-frame-corner tr"></div>
+      <div class="char-frame-corner bl"></div><div class="char-frame-corner br"></div>
+    </div>
+    <div class="char-info sa d2">
+      <span class="char-role-tag">🛡 Knight Companion</span>
+      <h3 class="char-name">Javier Asrahan</h3>
+      <p class="char-alias">The Sword Prodigy · Knight of House Frontera · Lloyd's Right Hand</p>
+      <p class="char-desc">
+        The greatest swordsman of his generation and Lloyd's most trusted companion. Often mistaken for the noble himself due to his regal appearance, Javier fights with unmatched precision. Where Lloyd builds, Javier protects — together they are unstoppable.
+      </p>
+      <div class="char-traits">
+        <span class="trait">Sword Prodigy</span>
+        <span class="trait">Unwavering Loyalty</span>
+        <span class="trait">Regal Bearing</span>
+        <span class="trait">Combat Master</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ GRAND PROJECTS ════════════ -->
+<section id="quests">
+  <div class="quests-bg"></div>
+  <div class="w">
+    <div style="text-align:center;margin-bottom:3.5rem">
+      <div class="gold-divider"><i>⚜</i></div>
+      <span class="sec-label sa" style="justify-content:center">Chapter II &nbsp;·&nbsp; Territories Claimed</span>
+      <h2 class="sec-title sa d1" style="margin-top:0.5rem">Grand <span class="g">Projects</span></h2>
+      <p class="sec-sub sa d2">The estates I have built, the territories I am claiming.</p>
+    </div>
+    <div class="quests-grid">
+
+      <!-- ★ VYRON — FEATURED ★ -->
+      <div class="qcard vyron sa d1">
+        <div>
+          <div class="qcard-top-bar"></div>
+          <div class="qcard-shine"></div>
+          <div class="qcard-head">
+            <span class="qarc">⚜ Flagship Estate · Service Marketplace</span>
+            <div class="qname">Vyron</div>
+            <div style="font-family:'Cinzel',serif;font-size:0.85rem;color:rgba(201,168,76,0.55);margin-top:0.2rem;font-style:italic">Where you can buy any service you want</div>
+            <div><span class="qbadge active">Active Quest</span></div>
+          </div>
+          <div class="qcard-body">
+            <p class="qdesc">
+              Vyron is a service marketplace shop built by SylphieChan — a place where you can browse and purchase any service you need. Whether it's design, development, writing, or creative work, Vyron is the one-stop shop. Built with simplicity, speed, and elegance in mind — the noble estate of digital services.
+            </p>
+            <div class="qtags">
+              <span class="qtag">Marketplace</span>
+              <span class="qtag">Services</span>
+              <span class="qtag">Shop</span>
+              <span class="qtag">Python</span>
+              <span class="qtag">Startup</span>
+            </div>
+            <a href="#" class="qlink">⚔ Visit Vyron →</a>
+          </div>
+        </div>
+        <div class="vyron-side">
+          <div class="vyron-icon">🏪</div>
+          <div class="vy-meta">
+            <div class="vy-m-row">
+              <span class="vy-mk">Type</span>
+              <span class="vy-mv">Service Shop</span>
+            </div>
+            <div class="vy-m-row">
+              <span class="vy-mk">Status</span>
+              <span class="vy-mv" style="color:#5BC77E">🚧 Active</span>
+            </div>
+            <div class="vy-m-row">
+              <span class="vy-mk">Built By</span>
+              <span class="vy-mv">SylphieChan</span>
+            </div>
+            <div class="vy-m-row">
+              <span class="vy-mk">Stack</span>
+              <span class="vy-mv">Python</span>
+            </div>
+            <div class="vy-m-row">
+              <span class="vy-mk">Year</span>
+              <span class="vy-mv">2025</span>
+            </div>
+          </div>
+          <div class="vyron-quote">"Like a nobleman opening the estate gates to all — every service, for every traveler."</div>
+        </div>
+      </div>
+
+      <!-- E-Commerce -->
+      <div class="qcard sa d2">
+        <div class="qcard-top-bar"></div>
+        <div class="qcard-shine"></div>
+        <div class="qcard-head">
+          <span class="qarc">⚔ Neon Ronin Arc · Local Commerce</span>
+          <div class="qname">E-Commerce Startup</div>
+          <span class="qbadge active">Active Quest</span>
+        </div>
+        <div class="qcard-body">
+          <p class="qdesc">A lightweight, local-focused e-commerce system targeting small towns like Minchinabad. Connects nearby shopkeepers with online customers, low-cost delivery, and a basic reward system. Minimal, fast, and simple.</p>
+          <div class="qtags">
+            <span class="qtag">E-Commerce</span><span class="qtag">Python</span>
+            <span class="qtag">Local</span><span class="qtag">Startup</span>
+          </div>
+          <a href="#" class="qlink">⚔ View Project →</a>
+        </div>
+      </div>
+
+      <!-- Japanese -->
+      <div class="qcard sa d3">
+        <div class="qcard-top-bar"></div>
+        <div class="qcard-shine"></div>
+        <div class="qcard-head">
+          <span class="qarc">⚔ Void Striker Arc · Language</span>
+          <div class="qname">Learning Japanese</div>
+          <span class="qbadge active">Active Quest</span>
+        </div>
+        <div class="qcard-body">
+          <p class="qdesc">Grinding Kanji, Hiragana, and Katakana. Unlocking a new language to get closer to the anime source material — and maybe move to Japan someday. 日本語はおもしろいです！</p>
+          <div class="qtags">
+            <span class="qtag">日本語</span><span class="qtag">Skill</span><span class="qtag">Self-Study</span>
+          </div>
+          <div style="margin-top:auto;padding-top:1rem;display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:rgba(245,237,214,0.4)">
+            <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.1em;color:var(--gold)">PROGRESS</span>
+            <div style="flex:1;height:2px;background:rgba(201,168,76,0.1);position:relative">
+              <div style="position:absolute;top:0;left:0;bottom:0;width:40%;background:linear-gradient(90deg,var(--gold-d),var(--gold))"></div>
+            </div>
+            <span style="font-family:'Cinzel',serif;color:var(--gold);font-size:0.85rem">40%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIT -->
+      <div class="qcard sa d4" style="grid-column:1/-1">
+        <div class="qcard-top-bar"></div>
+        <div class="qcard-shine"></div>
+        <div class="qcard-head">
+          <span class="qarc">⚜ Spirit Grove Arc · Final Boss</span>
+          <div class="qname">Road to MIT</div>
+          <span class="qbadge soon">⚔ Final Conquest</span>
+        </div>
+        <div class="qcard-body">
+          <p class="qdesc">Preparing for the ultimate challenge — MIT, Cambridge. Studying hard, building a strong portfolio, and chasing the dream of attending the Massachusetts Institute of Technology. The greatest estate of all is built through knowledge.</p>
+          <div class="qtags">
+            <span class="qtag">Study</span><span class="qtag">Dream</span>
+            <span class="qtag">MIT</span><span class="qtag">Cambridge</span><span class="qtag">Science</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ CHARACTER SPOTLIGHT 3 — Count Asrahan ════════════ -->
+<div class="char-spotlight">
+  <div class="char-bg-strip"></div>
+  <div class="char-inner" style="max-width:1100px;margin:0 auto;padding:0 6vw">
+    <div class="char-img-wrap sa from-left">
+      <div class="char-frame">
+        <div class="char-fallback">
+          <div class="cf-icon">🏰</div>
+          <div class="cf-name">Baron Frontera</div>
+        </div>
+      </div>
+      <div class="char-frame-corner tl"></div><div class="char-frame-corner tr"></div>
+      <div class="char-frame-corner bl"></div><div class="char-frame-corner br"></div>
+    </div>
+    <div class="char-info sa d2">
+      <span class="char-role-tag">🏰 Baron of the Estate</span>
+      <h3 class="char-name">Baron Arcos Frontera</h3>
+      <p class="char-alias">Father of Lloyd · Head of House Frontera · The Struggling Baron</p>
+      <p class="char-desc">
+        Head of the debt-ridden House Frontera, Arcos is a proud but overwhelmed baron trying to keep his family's name alive. When his son Lloyd suddenly transforms into a brilliant estate developer, Arcos must learn to trust the process — even when it looks absolutely insane. The foundation of the family that would become legend.
+      </p>
+      <div class="char-traits">
+        <span class="trait">Noble Heritage</span>
+        <span class="trait">Family Pride</span>
+        <span class="trait">Estate Head</span>
+        <span class="trait">Debt-Ridden Baron</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ SKILL TREE ════════════ -->
+<section id="skills">
+  <div class="w">
+    <div style="text-align:center;margin-bottom:3.5rem">
+      <div class="gold-divider"><i>⚜</i></div>
+      <span class="sec-label sa" style="justify-content:center">Chapter III &nbsp;·&nbsp; Noble Abilities</span>
+      <h2 class="sec-title sa d1" style="margin-top:0.5rem">Noble <span class="g">Skill Tree</span></h2>
+      <p class="sec-sub sa d2">Abilities honed through countless hours of training and sacrifice.</p>
+    </div>
+    <div class="skills-grid" id="sk-grid"></div>
+  </div>
+</section>
+
+<!-- ════════════ ESTATE LEDGER ════════════ -->
+<section id="ledger">
+  <div class="w">
+    <div style="text-align:center;margin-bottom:3.5rem">
+      <div class="gold-divider"><i>⚜</i></div>
+      <span class="sec-label sa" style="justify-content:center">Chapter IV &nbsp;·&nbsp; Chronicle of Conquests</span>
+      <h2 class="sec-title sa d1" style="margin-top:0.5rem">Estate <span class="g">Ledger</span></h2>
+      <p class="sec-sub sa d2">A chronicle of milestones, campaigns, and conquered territories.</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-item sa">
+        <div class="tl-yr"><span>'25</span></div>
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <span class="tl-type">⚜ Flagship Venture</span>
+          <div class="tl-title">Launched Vyron — Service Shop</div>
+          <div class="tl-sub">Solo Project · 2025 — Present</div>
+          <p class="tl-desc">Built Vyron, a service marketplace where anyone can buy any service they want. Designed with simplicity and speed, it is the noble estate of digital services.</p>
+        </div>
+      </div>
+      <div class="tl-item sa d1">
+        <div class="tl-yr"><span>'25</span></div>
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <span class="tl-type">Solo Campaign</span>
+          <div class="tl-title">Building E-Commerce Startup</div>
+          <div class="tl-sub">Solo Project · Minchinabad Focus · 2025 — Present</div>
+          <p class="tl-desc">Building a lightweight local e-commerce system connecting nearby shopkeepers with online customers. Minimal, fast, and simple — for the people.</p>
+        </div>
+      </div>
+      <div class="tl-item sa d2">
+        <div class="tl-yr"><span>'25</span></div>
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <span class="tl-type">Language Acquisition</span>
+          <div class="tl-title">Learning Japanese</div>
+          <div class="tl-sub">Self-Study / Online Resources · 2025 — Present</div>
+          <p class="tl-desc">Actively learning Japanese — Hiragana, Katakana, and Kanji. Motivated by a love of anime and the dream of one day experiencing Japan firsthand.</p>
+        </div>
+      </div>
+      <div class="tl-item sa d3">
+        <div class="tl-yr"><span>'25</span></div>
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <span class="tl-type">Skill Acquisition</span>
+          <div class="tl-title">Learning Programming</div>
+          <div class="tl-sub">Self-Taught · Python & Beyond · 2025 — Present</div>
+          <p class="tl-desc">i hope it ends soon ;-; Grinding through programming concepts, building real projects, leveling up skills one bug at a time. Primary weapon: Python.</p>
+        </div>
+      </div>
+      <div class="tl-item sa d4">
+        <div class="tl-yr"><span>∞</span></div>
+        <div class="tl-dot" style="border-color:var(--gold);background:rgba(201,168,76,0.15)"></div>
+        <div class="tl-content">
+          <span class="tl-type">⚜ Final Quest</span>
+          <div class="tl-title" style="color:var(--gold)">Road to MIT</div>
+          <div class="tl-sub">Cambridge, Massachusetts · Conquest — Future</div>
+          <p class="tl-desc">The ultimate quest. Studying hard, building a strong portfolio, and chasing the dream of MIT. The greatest estate of all.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ CONTACT ════════════ -->
+<section id="contact">
+  <div class="w">
+    <div style="text-align:center;margin-bottom:3.5rem">
+      <div class="gold-divider"><i>⚜</i></div>
+      <span class="sec-label sa" style="justify-content:center">Chapter V &nbsp;·&nbsp; Open Gates</span>
+      <h2 class="sec-title sa d1" style="margin-top:0.5rem">Send a <span class="g">Raven</span></h2>
+      <p class="sec-sub sa d2">Let's start a new adventure together. The estate gates are open.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="sa from-left">
+        <div class="contact-h">Begin a New Quest</div>
+        <p class="contact-p">Want to collaborate, talk anime, swap stories about programming, or just say hi — I'm always open for a new adventure. Whether you need a service from Vyron or want to build something together.</p>
+        <div class="clinks">
+          <a href="https://github.com/prashant69696969" target="_blank" class="clink">
+            <div class="clink-icon">🐙</div>
+            <div><span class="clink-lbl">GitHub</span>@SylphieChan · prashant69696969</div>
+          </a>
+          <a href="https://www.linkedin.com/in/sylphie-chan-a49a9327b/" target="_blank" class="clink">
+            <div class="clink-icon">💼</div>
+            <div><span class="clink-lbl">LinkedIn</span>Sylphie Chan</div>
+          </a>
+          <a href="#" class="clink">
+            <div class="clink-icon">🎮</div>
+            <div><span class="clink-lbl">Discord</span>1or.1</div>
+          </a>
+          <a href="mailto:sylphiechan@proton.me" class="clink">
+            <div class="clink-icon">📧</div>
+            <div><span class="clink-lbl">Email</span>sylphiechan@proton.me</div>
+          </a>
+        </div>
+      </div>
+      <div class="sa from-right d2">
+        <div class="scroll-form">
+          <div class="form-ttl">⚜ Dispatch a Message ⚜</div>
+          <div class="ff"><label class="fl">Your Name</label><input type="text" class="fi" placeholder="Noble title or humble name..."></div>
+          <div class="ff"><label class="fl">Email</label><input type="email" class="fi" placeholder="your@scroll.com"></div>
+          <div class="ff"><label class="fl">Your Message</label><textarea class="fta" placeholder="What quest do you bring, traveler?"></textarea></div>
+          <button class="fsub" onclick="this.textContent='⚜ Raven Dispatched!';setTimeout(()=>this.textContent='⚡ Dispatch Message',3000)">⚡ Dispatch Message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer>
+  <div class="fc">⚜ SYLPHIETTE ⚜</div>
+  <p class="fp">© 2026 Sylphiette (SylphieChan) · Made with ❤ and Anime · The Greatest Estate Developer · The Estate Endures</p>
+</footer>
+
+<script>
+/* ─── PARTICLES (drift in front of the photo) ─── */
+(function(){
+  const pts = document.getElementById('pts');
+  for(let i=0;i<28;i++){
+    const p = document.createElement('div');
+    p.className = 'pt';
+    const sz = Math.random()>0.7?3:1.5;
+    p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;animation-duration:${10+Math.random()*14}s;animation-delay:${Math.random()*12}s`;
+    pts.appendChild(p);
+  }
+})();
+
+/* ─── SCROLL ANIMATIONS (reveal-on-scroll) ─── */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+},{threshold:0.12,rootMargin:'0px 0px -60px 0px'});
+document.querySelectorAll('.sa').forEach(el=>io.observe(el));
+
+/* ─── SKILL BARS ─── */
+const skills=[
+  {n:'Python',p:75},{n:'Watching Anime',p:100},{n:'Japanese (Learning)',p:40},
+  {n:'Running',p:80},{n:'Studying',p:85},{n:'Problem Solving',p:78}
+];
+const sg = document.getElementById('sk-grid');
+skills.forEach((s,i)=>{
+  sg.innerHTML+=`<div class="sk sa d${(i%3)+1}">
+    <div class="sk-row"><span class="sk-name">${s.n}</span><span class="sk-pct">${s.p}%</span></div>
+    <div class="sk-track"><div class="sk-fill" data-w="${s.p}"></div></div>
+  </div>`;
+});
+document.querySelectorAll('.sk').forEach(el=>io.observe(el));
+
+const sio = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.sk-fill').forEach(f=>{ f.style.width=f.dataset.w+'%'; });
+    }
+  });
+},{threshold:0.3});
+sio.observe(sg);
+
+/* ─── COUNTER ─── */
+function animCount(el,target,dur){
+  let v=0,step=target/(dur/16);
+  const t=setInterval(()=>{ v=Math.min(v+step,target);el.textContent=Math.floor(v);if(v>=target)clearInterval(t); },16);
+}
+const ctr=document.getElementById('ctr-proj');
+const cio=new IntersectionObserver(([e])=>{if(e.isIntersecting){animCount(ctr,4,1000);cio.disconnect();}});
+cio.observe(ctr);
+
+/* ─── BACKGROUND PHOTO PARALLAX ─── */
+/* The real photo pans slowly and zooms a touch as you scroll — a classic
+   "fixed-feel" parallax that makes a single static photograph feel like a
+   living backdrop behind the whole page, rather than a flat pasted image. */
+const bgPhotoLayer = document.querySelector('.bg-photo-layer');
+const bgGoldWash = document.querySelector('.bg-gold-wash');
+let ticking = false;
+
+function updateParallax(){
+  const y = window.scrollY;
+  const vh = window.innerHeight || 1;
+  const progress = Math.min(y / (vh*2.5), 1); // eases out over ~2.5 screens of scroll
+  if(bgPhotoLayer){
+    bgPhotoLayer.style.transform = `translateY(${progress*40}px) scale(${1 + progress*0.05})`;
+  }
+  if(bgGoldWash){
+    bgGoldWash.style.opacity = 1 - progress*0.4; // gold glow fades slightly deeper into the page
+  }
+  ticking = false;
+}
+
+window.addEventListener('scroll',()=>{
+  if(!ticking){
+    requestAnimationFrame(updateParallax);
+    ticking = true;
+  }
+},{ passive:true });
+updateParallax();
+</script>
+</body>
+</html>
